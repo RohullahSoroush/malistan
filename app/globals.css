@@ -1,4 +1,8 @@
 @import "tailwindcss";
+
+.creator-credit { font-size: 10px; }
+.creator-credit a { display: inline-flex; align-items: center; gap: 3px; text-decoration: underline; text-underline-offset: 3px; }
+.creator-credit a:hover { color: var(--accent); }
 @theme inline {
   --color-forest: #234b3b;
   --color-ivory: #f8f6f0;

@@ -136,8 +136,11 @@ export function Footer() {
           © {new Date().getFullYear()} Malistan Archive · An independent
           community project
         </span>
-        <span lang="fa" dir="rtl">
-          با مهر، برای مالستان
+        <span className="creator-credit">
+          Designed &amp; built by{" "}
+          <a href="https://rohullah.me" target="_blank" rel="noopener noreferrer">
+            Rohullah Mohammadi <ArrowUpRight size={12} aria-hidden="true" />
+          </a>
         </span>
         <span>
           Ghazni, Afghanistan <span className="live-dot" />
