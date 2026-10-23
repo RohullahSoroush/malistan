@@ -26,6 +26,8 @@ npm run build
 - Cinematic letter-by-letter hero entrance, interactive valley/winter crossfades, scroll-linked landscape parallax, reading progress, staggered reveals and page transitions using Motion. Reduced-motion preferences are respected; the hero also has a landscape-motion toggle.
 - Immersive menu with keyboard focus containment, Escape handling and background scroll locking; asymmetric photo compositions and a consistent editorial theme on every page.
 - Locally hosted DM Serif Display and Manrope fonts. Font licences are included under `public/fonts/`; no external font request is needed at runtime.
+- Warm light and forest dark themes, with a header appearance selector (Auto / Light / Dark). The choice persists locally, is applied before first paint, and follows OS changes in Auto mode. Theme tokens and responsive refinements live in `app/appearance.css`.
+- Adaptive laptop hero, readable phone typography, tablet contents panels, and touch-friendly navigation. Responsive checks cover all eight routes from 320px to 1440px, including 1366 × 650 laptop browser viewports.
 - Per-page metadata, canonical links, Open Graph, Place JSON-LD, sitemap, robots.txt and static rendering.
 
 ## Content and images

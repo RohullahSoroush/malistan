@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { ArrowUpRight, Menu, X, Search, ArrowRight } from "lucide-react";
 import { MountainMark } from "./icons";
 import { articles } from "@/lib/content";
+import { ThemeSwitcher } from "./theme-switcher";
 const links = [
   ["Discover", "/"],
   ["History", "/history"],
@@ -18,6 +19,10 @@ export function Header() {
   const [search, setSearch] = useState(false);
   const [query, setQuery] = useState("");
   const path = usePathname();
+  useEffect(() => {
+    setOpen(false);
+    setSearch(false);
+  }, [path]);
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const update = () => setScrolled(window.scrollY > 60);
@@ -45,7 +50,7 @@ export function Header() {
       if (event.key === "Tab") {
         const items = [
           ...document.querySelectorAll<HTMLElement>(
-            ".header a, .header button",
+            ".header a, .header button, .header select",
           ),
         ].filter((el) => el.getClientRects().length > 0);
         const first = items[0],
@@ -96,8 +101,11 @@ export function Header() {
               {text}
             </Link>
           ))}
+          <Link href="/about" className="menu-extra" aria-current={path === "/about" ? "page" : undefined} onClick={() => setOpen(false)}>Our story</Link>
+          <Link href="/sources" className="menu-extra" aria-current={path === "/sources" ? "page" : undefined} onClick={() => setOpen(false)}>Sources & credits</Link>
         </nav>
         <div className="header-actions">
+          <ThemeSwitcher />
           <button
             aria-label="Search the archive"
             className="icon-button"
@@ -137,7 +145,10 @@ export function Header() {
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Try music, Maknak, history…"
               onKeyDown={(e) => {
-                if (e.key === "Escape") setSearch(false);
+                if (e.key === "Escape") {
+                  setSearch(false);
+                  document.querySelector<HTMLButtonElement>('button[aria-label="Search the archive"]')?.focus();
+                }
               }}
             />
             {query && (

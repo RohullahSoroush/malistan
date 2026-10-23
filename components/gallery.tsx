@@ -1,12 +1,19 @@
 "use client";
 import Image from "next/image";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { photos } from "@/lib/content";
 import { ArrowUpRight, Expand, X } from "lucide-react";
 export function Gallery() {
   const [category, setCategory] = useState("All photographs");
   const [selected, setSelected] = useState(0);
+  const [isOpen, setIsOpen] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    if (!isOpen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = previous; };
+  }, [isOpen]);
   return (
     <>
       <div className="filter-row" aria-label="Filter photographs">
@@ -46,6 +53,7 @@ export function Gallery() {
                 onClick={() => {
                   setSelected(photos.indexOf(p));
                   dialog.current?.showModal();
+                  setIsOpen(true);
                 }}
               >
                 <div>
@@ -53,6 +61,7 @@ export function Gallery() {
                     src={p.src}
                     alt={p.description}
                     fill
+                    loading="eager"
                     sizes="(max-width: 650px) 100vw, 50vw"
                   />
                   <span className="expand-icon">
@@ -70,6 +79,7 @@ export function Gallery() {
         aria-label="Photograph details"
         ref={dialog}
         className="photo-dialog"
+        onClose={() => setIsOpen(false)}
         onClick={(e) => {
           if (e.target === dialog.current) dialog.current.close();
         }}

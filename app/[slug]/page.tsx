@@ -58,6 +58,7 @@ export default async function ArticlePage({
           }
           fill
           priority
+          loading="eager"
           sizes="100vw"
         />
         <span className="photo-label">

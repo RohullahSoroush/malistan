@@ -4,7 +4,10 @@ import { Header, Footer } from "@/components/site";
 import { Experience } from "@/components/experience";
 import "./globals.css";
 import "./editorial.css";
+import "./appearance.css";
 const site = siteUrl;
+// Apply the saved preference before first paint; the switcher owns subsequent changes.
+const themeScript = `(function(){var p='system';try{p=localStorage.getItem('malistan-theme')||'system'}catch(e){}var dark=p==='dark'||(p!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.dataset.theme=dark?'dark':'light'})()`;
 export const metadata: Metadata = {
   metadataBase: new URL(site),
   title: {
@@ -39,7 +42,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" data-scroll-behavior="smooth">
+    <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
+      <head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head>
       <body>
         <a className="skip-link" href="#main">
           Skip to content
