@@ -1,10 +1,128 @@
-import type {Metadata} from 'next';
-import Link from 'next/link';
-import Image from 'next/image';
-import {notFound} from 'next/navigation';
-import {ArrowUpRight,ArrowLeft} from 'lucide-react';
-import {articles,sources} from '@/lib/content';
-export function generateStaticParams(){return Object.keys(articles).map(slug=>({slug}))}
-export async function generateMetadata({params}:{params:Promise<{slug:string}>}):Promise<Metadata>{const {slug}=await params;const a=articles[slug];return a?{title:a.eyebrow,description:a.intro,alternates:{canonical:'/'+slug},openGraph:{title:a.eyebrow+' | Malistan Archive',description:a.intro}}:{title:'Page not found'}}
-export default async function ArticlePage({params}:{params:Promise<{slug:string}>}){const {slug}=await params;const a=articles[slug];if(!a)notFound();return <main id="main"><section className="article-hero container"><Link href="/" className="back-link"><ArrowLeft size={15}/> Back to Malistan</Link><span className="eyebrow">{a.eyebrow}</span><h1>{a.title}</h1><p>{a.intro}</p></section><div className="container article-image"><Image src={a.image} alt={a.image.includes('winter')?'Snow across the Malistan highlands':'Mountain landscape of Malistan'} fill priority sizes="100vw"/><span className="photo-label">Malistan, Ghazni · <Link href="/sources#photo-credits">Photo credits ↗</Link></span></div><div className="container article-layout"><aside><span className="eyebrow">IN THIS STORY</span>{a.sections.map(s=><a href={'#'+slugify(s.title)} key={s.title}>{s.title.split(' · ')[0]}</a>)}<Link href="/sources" className="text-link">View source library <ArrowUpRight size={15}/></Link></aside><article>{a.sections.map(s=><section id={slugify(s.title)} key={s.title}><h2>{s.title}</h2><p>{s.text}</p>{s.source&&<a href={sources.find(x=>x.id===s.source)?.url} target="_blank" rel="noreferrer" className="source-link">Source: {sources.find(x=>x.id===s.source)?.name} <ArrowUpRight size={13}/></a>}</section>)}<div className="editorial-note"><span className="eyebrow">A GROWING COMMUNITY ARCHIVE</span><p>Researched for this edition in October 2026. Historical information is identified by source date. Local knowledge and documented corrections can help future editions grow.</p></div></article></div><div className="container next-stories"><h2>Keep <em>exploring.</em></h2><div>{Object.entries(articles).filter(([key])=>key!==slug&&key!=='about').slice(0,3).map(([key,a])=><Link key={key} href={'/'+key}>{a.eyebrow}<ArrowUpRight size={20}/></Link>)}</div></div></main>}
-function slugify(value:string){return value.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/-$/,'')}
+import type { Metadata } from "next";
+import Link from "next/link";
+import Image from "next/image";
+import { notFound } from "next/navigation";
+import { ArrowUpRight, ArrowLeft } from "lucide-react";
+import { articles, sources } from "@/lib/content";
+export function generateStaticParams() {
+  return Object.keys(articles).map((slug) => ({ slug }));
+}
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const a = articles[slug];
+  return a
+    ? {
+        title: a.eyebrow,
+        description: a.intro,
+        alternates: { canonical: "/" + slug },
+        openGraph: {
+          title: a.eyebrow + " | Malistan Archive",
+          description: a.intro,
+        },
+      }
+    : { title: "Page not found" };
+}
+export default async function ArticlePage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const a = articles[slug];
+  if (!a) notFound();
+  return (
+    <main id="main">
+      <section className="article-hero container">
+        <Link href="/" className="back-link">
+          <ArrowLeft size={15} /> Back to Malistan
+        </Link>
+        <span className="eyebrow">{a.eyebrow}</span>
+        <h1>{a.title}</h1>
+        <p>{a.intro}</p>
+      </section>
+      <div className="container article-image">
+        <Image
+          src={a.image}
+          alt={
+            a.image.includes("winter")
+              ? "Snow across the Malistan highlands"
+              : "Mountain landscape of Malistan"
+          }
+          fill
+          priority
+          sizes="100vw"
+        />
+        <span className="photo-label">
+          Malistan, Ghazni ·{" "}
+          <Link href="/sources#photo-credits">Photo credits ↗</Link>
+        </span>
+      </div>
+      <div className="container article-layout">
+        <aside>
+          <span className="eyebrow">IN THIS STORY</span>
+          {a.sections.map((s) => (
+            <a href={"#" + slugify(s.title)} key={s.title}>
+              {s.title.split(" · ")[0]}
+            </a>
+          ))}
+          <Link href="/sources" className="text-link">
+            View source library <ArrowUpRight size={15} />
+          </Link>
+        </aside>
+        <article>
+          {a.sections.map((s) => (
+            <section id={slugify(s.title)} key={s.title}>
+              <h2>{s.title}</h2>
+              <p>{s.text}</p>
+              {s.source && (
+                <a
+                  href={sources.find((x) => x.id === s.source)?.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="source-link"
+                >
+                  Source: {sources.find((x) => x.id === s.source)?.name}{" "}
+                  <ArrowUpRight size={13} />
+                </a>
+              )}
+            </section>
+          ))}
+          <div className="editorial-note">
+            <span className="eyebrow">A GROWING COMMUNITY ARCHIVE</span>
+            <p>
+              Researched for this edition in October 2026. Historical
+              information is identified by source date. Local knowledge and
+              documented corrections can help future editions grow.
+            </p>
+          </div>
+        </article>
+      </div>
+      <div className="container next-stories">
+        <h2>
+          Keep <em>exploring.</em>
+        </h2>
+        <div>
+          {Object.entries(articles)
+            .filter(([key]) => key !== slug && key !== "about")
+            .slice(0, 3)
+            .map(([key, a]) => (
+              <Link key={key} href={"/" + key}>
+                {a.eyebrow}
+                <ArrowUpRight size={20} />
+              </Link>
+            ))}
+        </div>
+      </div>
+    </main>
+  );
+}
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/-$/, "");
+}

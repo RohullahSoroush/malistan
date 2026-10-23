@@ -1,1 +1,24 @@
-export function MountainMark({className=''}:{className?:string}) {return <svg className={className} width="44" height="36" viewBox="0 0 44 36" fill="none" aria-hidden="true"><path d="M2 30 17 7l8 13 5-8 12 18H2Z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round"/><path d="m11 16 6 5 5-5M25 20l5 4 5-4M9 34h26" stroke="currentColor" strokeWidth="1.7"/></svg>}
+export function MountainMark({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width="44"
+      height="36"
+      viewBox="0 0 44 36"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M2 30 17 7l8 13 5-8 12 18H2Z"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinejoin="round"
+      />
+      <path
+        d="m11 16 6 5 5-5M25 20l5 4 5-4M9 34h26"
+        stroke="currentColor"
+        strokeWidth="1.7"
+      />
+    </svg>
+  );
+}
