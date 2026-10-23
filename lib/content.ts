@@ -178,7 +178,7 @@ export const articles: Record<string, Article> = {
     title: "For Malistan.\nFor generations.",
     eyebrow: "About the archive",
     intro:
-      "An independent community archive, founded by Muhammadi out of love for his hometown in Ghazni, Afghanistan.",
+      "An independent community archive, founded by Rohullah Mohammadi out of love for his hometown in Ghazni, Afghanistan.",
     image: "/images/malistan-winter.webp",
     sections: [
       {

@@ -1,6 +1,6 @@
 # Malistan Archive
 
-A static community heritage website for Malistan (مالستان), Ghazni, Afghanistan. Built for Muhammadi with Next.js App Router, TypeScript, Tailwind CSS 4, Lucide icons and lightweight Motion animations.
+A static community heritage website for Malistan (مالستان), Ghazni, Afghanistan. Created by Rohullah Mohammadi with Next.js App Router, TypeScript, Tailwind CSS 4, Lucide icons and lightweight Motion animations.
 
 ## Run locally
 
