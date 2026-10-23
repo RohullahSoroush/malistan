@@ -20,8 +20,12 @@ export async function generateMetadata({
         description: a.intro,
         alternates: { canonical: "/" + slug },
         openGraph: {
+          type: "article",
+          siteName: "Malistan Archive",
+          url: "/" + slug,
           title: a.eyebrow + " | Malistan Archive",
           description: a.intro,
+          images: [{ url: a.image, alt: "Malistan, Ghazni, Afghanistan" }],
         },
       }
     : { title: "Page not found" };

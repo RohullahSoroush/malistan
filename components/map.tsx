@@ -3,15 +3,23 @@ import { useState } from "react";
 import { ArrowUpRight, MapPin } from "lucide-react";
 export function DistrictMap() {
   const [loaded, setLoaded] = useState(false);
+  const [ready, setReady] = useState(false);
   return (
     <div className="map-frame">
-      {loaded ? (
+      {loaded && (
         <iframe
           title="Interactive OpenStreetMap showing Malistan near Mir Adina, Ghazni, Afghanistan"
           src="https://www.openstreetmap.org/export/embed.html?bbox=66.80%2C33.10%2C67.56%2C33.56&layer=mapnik&marker=33.2953%2C67.1689"
-          loading="lazy"
+          onLoad={() => setReady(true)}
+          style={{
+            position: "absolute",
+            inset: 0,
+            zIndex: 1,
+            visibility: ready ? "visible" : "hidden",
+          }}
         />
-      ) : (
+      )}
+      {!ready && (
         <div className="map-art">
           <svg
             viewBox="0 0 800 440"
@@ -69,9 +77,20 @@ export function DistrictMap() {
             <strong>Malistan</strong>
             <span>Mir Adina · Ghazni</span>
           </div>
-          <button className="button map-load" onClick={() => setLoaded(true)}>
-            Explore interactive map <ArrowUpRight size={17} />
-          </button>
+          {loaded ? (
+            <a
+              className="button map-load"
+              href="https://www.openstreetmap.org/?mlat=33.2953&mlon=67.1689#map=11/33.2953/67.1689"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Map loading · open full map <ArrowUpRight size={17} />
+            </a>
+          ) : (
+            <button className="button map-load" onClick={() => setLoaded(true)}>
+              Explore interactive map <ArrowUpRight size={17} />
+            </button>
+          )}
           <small className="map-note">
             Illustrative landscape · not a boundary map
           </small>
@@ -79,6 +98,7 @@ export function DistrictMap() {
       )}
       <a
         className="map-external"
+        style={{ zIndex: 2 }}
         href="https://www.openstreetmap.org/?mlat=33.2953&mlon=67.1689#map=11/33.2953/67.1689"
         target="_blank"
         rel="noreferrer"

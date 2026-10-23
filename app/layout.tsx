@@ -22,7 +22,7 @@ export const metadata: Metadata = {
       {
         url: "/images/malistan-valley.webp",
         width: 1280,
-        height: 720,
+        height: 853,
         alt: "The mountainous landscape of Malistan, Afghanistan",
       },
     ],
@@ -37,7 +37,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" data-scroll-behavior="smooth">
       <body>
         <a className="skip-link" href="#main">
           Skip to content

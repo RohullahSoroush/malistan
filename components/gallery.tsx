@@ -67,6 +67,7 @@ export function Gallery() {
         </div>
       )}
       <dialog
+        aria-label="Photograph details"
         ref={dialog}
         className="photo-dialog"
         onClick={(e) => {
