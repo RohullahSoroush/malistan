@@ -23,7 +23,9 @@ npm run build
 - Landing page, history, places, culture, people, about, gallery, and sources.
 - Client-side archive search, mobile navigation, photo category filters, accessible native image dialog.
 - Click-to-load OpenStreetMap centred near Mir Adina. The initial decorative illustration does not depict district boundaries.
-- Motion scroll reveals with reduced-motion support. Content remains visible without animations.
+- Cinematic letter-by-letter hero entrance, interactive valley/winter crossfades, scroll-linked landscape parallax, reading progress, staggered reveals and page transitions using Motion. Reduced-motion preferences are respected; the hero also has a landscape-motion toggle.
+- Immersive menu with keyboard focus containment, Escape handling and background scroll locking; asymmetric photo compositions and a consistent editorial theme on every page.
+- Locally hosted DM Serif Display and Manrope fonts. Font licences are included under `public/fonts/`; no external font request is needed at runtime.
 - Per-page metadata, canonical links, Open Graph, Place JSON-LD, sitemap, robots.txt and static rendering.
 
 ## Content and images

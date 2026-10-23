@@ -5,7 +5,7 @@ export function DistrictMap() {
   const [loaded, setLoaded] = useState(false);
   const [ready, setReady] = useState(false);
   return (
-    <div className="map-frame">
+    <div className={ready ? "map-frame map-interactive" : "map-frame"}>
       {loaded && (
         <iframe
           title="Interactive OpenStreetMap showing Malistan near Mir Adina, Ghazni, Afghanistan"

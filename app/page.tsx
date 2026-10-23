@@ -1,3 +1,4 @@
+import { CinematicHero } from "@/components/cinematic-hero";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -9,7 +10,6 @@ import {
   BookOpen,
   Users,
   Compass,
-  MoveDown,
 } from "lucide-react";
 import { Reveal } from "@/components/reveal";
 import { DistrictMap } from "@/components/map";
@@ -47,46 +47,7 @@ const topics = [
 export default function Home() {
   return (
     <main id="main">
-      <section className="hero">
-        <Image
-          src="/images/malistan-valley.webp"
-          alt="Mountain slopes surrounding cultivated fields in Malistan, Ghazni, Afghanistan"
-          fill
-          priority
-          sizes="100vw"
-          className="hero-image"
-        />
-        <div className="hero-shade" />
-        <div className="hero-content container">
-          <span className="eyebrow light">
-            <span className="tiny-line" />
-            GHAZNI, AFGHANISTAN · <span lang="fa">مالستان</span>
-          </span>
-          <h1>
-            Malistan.
-            <br />A place that stays <em>with you.</em>
-          </h1>
-          <p>
-            Welcome to Malistan. A land of mountain horizons,
-            <br className="desktop-break" /> enduring culture, and stories worth
-            keeping.
-          </p>
-          <Link href="#discover" className="button cream">
-            Discover our home <ArrowUpRight size={18} />
-          </Link>
-        </div>
-        <div className="hero-bottom container">
-          <span>
-            <MapPin size={14} /> Malistan · Central highlands of Afghanistan
-          </span>
-          <a href="#intro">
-            A little closer to home <MoveDown size={15} />
-          </a>
-        </div>
-        <span className="hero-dari" lang="fa" dir="rtl">
-          مالستان، خانهٔ ما
-        </span>
-      </section>
+      <CinematicHero />
       <div className="place-strip">
         <div className="container">
           <span>
@@ -101,7 +62,7 @@ export default function Home() {
       </div>
       <section id="intro" className="section container intro">
         <Reveal>
-          <span className="eyebrow">A SMALL PLACE. A DEEP CONNECTION.</span>
+          <span className="eyebrow">01 / ROOTED IN SOMETHING REAL</span>
           <h2>
             More than a place
             <br />
@@ -128,7 +89,7 @@ export default function Home() {
           <Reveal className="section-heading">
             <div>
               <span className="eyebrow">
-                THERE’S A STORY IN EVERY DIRECTION
+                02 / CHOOSE YOUR OWN PATH
               </span>
               <h2>
                 Find your way <em>into Malistan.</em>
@@ -136,7 +97,7 @@ export default function Home() {
             </div>
             <span className="small-note">Start with what speaks to you.</span>
           </Reveal>
-          <div className="topic-grid">
+          <div className="topic-grid editorial-topics">
             {topics.map(({ num, title, desc, href, icon: Icon }) => (
               <Reveal key={num}>
                 <Link href={href} className="topic-card">
@@ -144,6 +105,13 @@ export default function Home() {
                     <Icon size={26} strokeWidth={1.3} />
                     <span>{num}</span>
                   </span>
+                  <span
+                    className="topic-photo"
+                    aria-hidden="true"
+                    style={{
+                      backgroundImage: `url(${num === "02" || num === "04" ? "/images/malistan-winter.webp" : "/images/malistan-valley.webp"})`,
+                    }}
+                  />
                   <h3>{title}</h3>
                   <p>{desc}</p>
                   <span className="circle-arrow">
@@ -168,7 +136,7 @@ export default function Home() {
           </span>
         </Reveal>
         <Reveal className="landscape-copy">
-          <span className="eyebrow">THE LAND WE CALL HOME</span>
+          <span className="eyebrow">03 / A LANDSCAPE THAT LIVES WITHIN US</span>
           <h2>
             Quiet beauty.
             <br />
@@ -206,7 +174,7 @@ export default function Home() {
         <div className="container culture-inner">
           <Reveal>
             <span className="eyebrow light">
-              VOICES THAT CONNECT GENERATIONS
+              04 / VOICES THAT CONNECT GENERATIONS
             </span>
             <h2>
               A melody can carry
@@ -236,7 +204,7 @@ export default function Home() {
       <section className="section container">
         <Reveal className="section-heading">
           <div>
-            <span className="eyebrow">THROUGH A LOCAL LENS</span>
+            <span className="eyebrow">05 / NOTES FROM THE LANDSCAPE</span>
             <h2>
               A glimpse of <em>home.</em>
             </h2>
@@ -281,7 +249,7 @@ export default function Home() {
       <section className="map-section">
         <div className="container map-layout">
           <Reveal>
-            <span className="eyebrow">A PLACE IN THE WORLD</span>
+            <span className="eyebrow">06 / FIND US IN THE HIGHLANDS</span>
             <h2>
               Here, in the
               <br />
@@ -306,7 +274,7 @@ export default function Home() {
       <section className="section container stories">
         <Reveal className="section-heading">
           <div>
-            <span className="eyebrow">THE ARCHIVE, OPENED</span>
+            <span className="eyebrow">07 / STORIES WORTH YOUR TIME</span>
             <h2>
               Begin with a <em>story.</em>
             </h2>

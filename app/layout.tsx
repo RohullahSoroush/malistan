@@ -1,7 +1,9 @@
 import { siteUrl } from "@/lib/site-url";
 import type { Metadata } from "next";
 import { Header, Footer } from "@/components/site";
+import { Experience } from "@/components/experience";
 import "./globals.css";
+import "./editorial.css";
 const site = siteUrl;
 export const metadata: Metadata = {
   metadataBase: new URL(site),
@@ -43,6 +45,7 @@ export default function RootLayout({
           Skip to content
         </a>
         <Header />
+        <Experience />
         {children}
         <Footer />
       </body>

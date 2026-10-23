@@ -19,10 +19,11 @@ export function Reveal({
           animate(
             el,
             {
-              opacity: [0.65, 1],
-              transform: ["translateY(18px)", "translateY(0)"],
+              opacity: [0, 1],
+              transform: ["translateY(65px)", "translateY(0)"],
+              filter: ["blur(5px)", "blur(0px)"],
             },
-            { duration: 0.65, ease: [0.22, 1, 0.36, 1] },
+            { duration: 1, ease: [0.22, 1, 0.36, 1] },
           );
           observer.disconnect();
         }

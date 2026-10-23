@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowUpRight, Menu, X, Search, ArrowRight } from "lucide-react";
 import { MountainMark } from "./icons";
 import { articles } from "@/lib/content";
@@ -18,6 +18,57 @@ export function Header() {
   const [search, setSearch] = useState(false);
   const [query, setQuery] = useState("");
   const path = usePathname();
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const update = () => setScrolled(window.scrollY > 60);
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    return () => window.removeEventListener("scroll", update);
+  }, []);
+  useEffect(() => {
+    if (!open) return;
+    const previous = document.body.style.overflow;
+    const previousFocus = document.activeElement as HTMLElement | null;
+    document.body.style.overflow = "hidden";
+    const background = [
+      ...document.querySelectorAll<HTMLElement>("main, footer"),
+    ];
+    background.forEach((el) => {
+      el.inert = true;
+    });
+    document.querySelector<HTMLAnchorElement>(".nav.open a")?.focus();
+    const close = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+        previousFocus?.focus();
+      }
+      if (event.key === "Tab") {
+        const items = [
+          ...document.querySelectorAll<HTMLElement>(
+            ".header a, .header button",
+          ),
+        ].filter((el) => el.getClientRects().length > 0);
+        const first = items[0],
+          last = items[items.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last?.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first?.focus();
+        }
+      }
+    };
+    window.addEventListener("keydown", close);
+    return () => {
+      document.body.style.overflow = previous;
+      background.forEach((el) => {
+        el.inert = false;
+      });
+      window.removeEventListener("keydown", close);
+      if (document.activeElement === document.body) previousFocus?.focus();
+    };
+  }, [open]);
   const results = Object.entries(articles).filter(([key, a]) =>
     `${key} ${a.title} ${a.intro} ${a.sections.map((s) => s.title + " " + s.text).join(" ")}`
       .toLowerCase()
@@ -25,7 +76,9 @@ export function Header() {
   );
   return (
     <>
-      <header className="header">
+      <header
+        className={`header ${path === "/" ? "on-home" : ""} ${scrolled ? "is-scrolled" : ""} ${open ? "menu-active" : ""}`}
+      >
         <Link href="/" className="brand" aria-label="Malistan home">
           <MountainMark />
           <span>
@@ -48,7 +101,10 @@ export function Header() {
           <button
             aria-label="Search the archive"
             className="icon-button"
-            onClick={() => setSearch(!search)}
+            onClick={() => {
+              setSearch(!search);
+              setOpen(false);
+            }}
             aria-expanded={search}
           >
             {search ? <X size={19} /> : <Search size={19} />}
@@ -60,7 +116,10 @@ export function Header() {
             className="icon-button menu-button"
             aria-label={open ? "Close navigation" : "Open navigation"}
             aria-expanded={open}
-            onClick={() => setOpen(!open)}
+            onClick={() => {
+              setOpen(!open);
+              setSearch(false);
+            }}
           >
             {open ? <X /> : <Menu />}
           </button>
@@ -138,7 +197,11 @@ export function Footer() {
         </span>
         <span className="creator-credit">
           Designed &amp; built by{" "}
-          <a href="https://rohullah.me" target="_blank" rel="noopener noreferrer">
+          <a
+            href="https://rohullah.me"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Rohullah Mohammadi <ArrowUpRight size={12} aria-hidden="true" />
           </a>
         </span>
