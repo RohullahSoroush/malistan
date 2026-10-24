@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { ArrowUpRight, Camera, Map } from "lucide-react";
-import { sources, photos } from "@/lib/content";
+import { sources } from "@/lib/content";
+import { photos } from "@/lib/photos";
+
+const shared = photos.filter((p) => !p.source);
+const commons = photos.filter((p) => p.source);
 import { PageHero, SectionHeader } from "@/components/ui/section";
 import { Reveal } from "@/components/ui/reveal";
 
@@ -41,25 +45,31 @@ export default function SourcesPage() {
             id="credits-title"
             eyebrow="The people behind the pictures"
             title={<>Photo credits &amp; <em>licences</em></>}
-            intro="Both photographs come from Wikimedia Commons. The site uses resized WebP copies and some layouts crop them; the originals are linked below."
+            intro="The site uses resized WebP copies of each photograph, and some layouts crop them."
           />
           <div className="credits-grid">
-            {photos.map((p) => (
-              <div className="credit-card" key={p.src}>
-                <span className="credit-card__icon"><Camera size={20} aria-hidden="true" /></span>
-                <h3>{p.title}</h3>
-                <p>
-                  Photograph by {p.author}. Licensed under{" "}
-                  <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">
-                    CC BY-SA 4.0
-                  </a>
-                  .
-                </p>
-                <a className="link" href={p.source} target="_blank" rel="noopener noreferrer">
-                  Original &amp; author <ArrowUpRight aria-hidden="true" />
-                </a>
+            <div className="credit-card">
+              <span className="credit-card__icon"><Camera size={20} aria-hidden="true" /></span>
+              <h3>Shared by Rohullah Mohammadi</h3>
+              <p>
+                {shared.length} photographs of Malistan&apos;s valleys, fields, streams and seasons, shared
+                for this archive. All rights reserved — please ask before reusing them.
+              </p>
+              <div className="chip-row">
+                {shared.map((p) => <span className="chip" key={p.id}>{p.title}</span>)}
               </div>
-            ))}
+            </div>
+            <div className="credit-card">
+              <span className="credit-card__icon"><Camera size={20} aria-hidden="true" /></span>
+              <h3>Wikimedia Commons</h3>
+              {commons.map((p) => (
+                <p key={p.id}>
+                  <strong>{p.title}</strong> — photograph by {p.author}, licensed{" "}
+                  <a href={p.licenseUrl} target="_blank" rel="noopener noreferrer">{p.license}</a>.{" "}
+                  <a href={p.source} target="_blank" rel="noopener noreferrer">View original</a>
+                </p>
+              ))}
+            </div>
             <div className="credit-card tone-accent">
               <span className="credit-card__icon"><Map size={20} aria-hidden="true" /></span>
               <h3>Map data</h3>

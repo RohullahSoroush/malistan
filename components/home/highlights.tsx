@@ -3,8 +3,10 @@ import Link from "next/link";
 import { ArrowRight, Languages, Music2, Scissors, Wheat } from "lucide-react";
 import { SectionHeader } from "@/components/ui/section";
 import { Reveal } from "@/components/ui/reveal";
+import { photo } from "@/lib/photos";
 
 const crops = ["Wheat", "Maize", "Peas", "Grapes", "Almonds", "Potatoes"];
+const field = photo("malistan-hay-path");
 
 export function Highlights() {
   return (
@@ -23,16 +25,17 @@ export function Highlights() {
           <Reveal className="bento-slot bento-slot--photo">
             <div className="bento-card bento-card--photo parallax-img" data-tilt>
               <Image
-                src="/images/malistan-valley.webp"
-                alt="Poplar trees and green fields beneath misty mountains in Malistan"
+                src={field.src}
+                alt={field.description}
                 fill
-                sizes="(max-width: 1000px) 100vw, 50vw"
+                placeholder={field.blur}
+                sizes="(max-width: 1180px) 100vw, 50vw"
               />
-              <span className="chip">Landscape · Summer</span>
-              <h3>Green valleys beneath grey peaks.</h3>
+              <span className="chip">Fields · Summer</span>
+              <h3>Poplar-lined fields and quiet footpaths.</h3>
               <p>
-                Poplar-lined fields and village homes sit in the folds of the mountains, fed by
-                seasonal streams and a short, intense summer.
+                Hay dries in the sun beside the paths that link the villages, shaded by tall rows of
+                poplars — the valley floor at the height of a short, intense summer.
               </p>
               <Link className="link" href="/places">Explore the landscape <ArrowRight aria-hidden="true" /></Link>
             </div>

@@ -9,6 +9,7 @@ import { Toc } from "@/components/toc";
 import { Eyebrow, SectionHeader } from "@/components/ui/section";
 import { Reveal } from "@/components/ui/reveal";
 import { articles, sources } from "@/lib/content";
+import { photos } from "@/lib/photos";
 
 export function generateStaticParams() {
   return Object.keys(articles).map((slug) => ({ slug }));
@@ -28,7 +29,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       url: `/${slug}`,
       title: `${a.eyebrow} | Malistan Archive`,
       description: a.intro,
-      images: [{ url: a.image, alt: "Malistan, Ghazni, Afghanistan" }],
+      images: [{ url: a.image, alt: photos.find((p) => p.src === a.image)?.description ?? "Malistan, Ghazni, Afghanistan" }],
     },
   };
 }
@@ -46,6 +47,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   const minutes = Math.max(1, Math.round(words / 220));
   const toc = a.sections.map((s) => ({ id: slugify(s.title), label: s.title.split(" · ")[0] }));
   const more = Object.entries(articles).filter(([key]) => key !== slug && key !== "about").slice(0, 3);
+  const cover = photos.find((p) => p.src === a.image) ?? photos[0];
 
   return (
     <main id="main" className="page">
@@ -64,13 +66,14 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
         <figure className="article-cover">
           <Image
-            src={a.image}
-            alt={a.image.includes("winter") ? "Snow across the Malistan highlands" : "Mountain valley of Malistan"}
+            src={cover.src}
+            alt={cover.description}
             fill
             priority
+            placeholder={cover.blur}
             sizes="(max-width: 1240px) 100vw, 1200px"
           />
-          <figcaption>Malistan, Ghazni · <Link href="/sources#photo-credits">Photo credits</Link></figcaption>
+          <figcaption>{cover.title} · {cover.credit} · <Link href="/sources#photo-credits">Credits</Link></figcaption>
         </figure>
 
         <div className="article-layout">
@@ -119,7 +122,6 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               <TopicCard
                 href={`/${key}`}
                 image={item.image}
-                imagePosition={["30% 50%", "60% 50%", "85% 40%"][i]}
                 kicker={item.eyebrow}
                 title={item.title.replace("\n", " ")}
               />

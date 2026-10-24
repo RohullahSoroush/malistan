@@ -15,8 +15,8 @@ const topics: {
 }[] = [
   {
     slug: "history",
-    image: "/images/malistan-winter.webp",
-    position: "30% 50%",
+    image: "/images/malistan-rooftops-spring.webp",
+    position: "50% 50%",
     kicker: "Centuries of memory",
     title: "History & heritage",
     description: "From semi-autonomous Hazarajat to post-2001 rebuilding — the full arc, read with care.",
@@ -24,7 +24,7 @@ const topics: {
   },
   {
     slug: "places",
-    image: "/images/malistan-valley.webp",
+    image: "/images/malistan-clouds-valley.webp",
     position: "50% 60%",
     kicker: "Know the land",
     title: "Places & landscape",
@@ -33,8 +33,8 @@ const topics: {
   },
   {
     slug: "culture",
-    image: "/images/malistan-valley.webp",
-    position: "85% 40%",
+    image: "/images/malistan-flock.webp",
+    position: "55% 50%",
     kicker: "Living traditions",
     title: "Culture & everyday life",
     description: "Hazaragi, folk music, Nammad and Glem weaving, and the joy of Nowruz.",
@@ -42,8 +42,8 @@ const topics: {
   },
   {
     slug: "people",
-    image: "/images/malistan-winter.webp",
-    position: "80% 60%",
+    image: "/images/malistan-poplar-road.webp",
+    position: "50% 45%",
     kicker: "Faces & voices",
     title: "People of Malistan",
     description: "Musicians, scholars and community members who give the district its voice.",

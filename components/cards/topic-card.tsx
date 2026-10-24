@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, type LucideIcon } from "lucide-react";
+import { photos } from "@/lib/photos";
 
 export type Tone = "brand" | "accent";
 
@@ -34,6 +35,7 @@ export function TopicCard({
           src={image}
           alt=""
           fill
+          placeholder={photos.find((p) => p.src === image)?.blur ?? "empty"}
           sizes="(max-width: 580px) 100vw, (max-width: 1080px) 50vw, 25vw"
           style={imagePosition ? { objectPosition: imagePosition } : undefined}
         />

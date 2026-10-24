@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     siteName: "Malistan Archive",
     title: "Malistan — A Place. A People. A Story.",
     description: "A community archive celebrating Malistan, Ghazni — its landscapes, culture and people.",
-    images: [{ url: "/images/malistan-valley.webp", width: 1280, height: 853, alt: "The mountain valley of Malistan, Afghanistan" }],
+    images: [{ url: "/images/og-malistan.jpg", width: 1200, height: 630, alt: "Poplar groves and village homes beneath the mountains of Malistan, Ghazni" }],
   },
   twitter: { card: "summary_large_image" },
   robots: { index: true, follow: true },

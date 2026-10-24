@@ -36,25 +36,6 @@ export const sources = [
   },
 ];
 
-export const photos = [
-  {
-    src: "/images/malistan-valley.webp",
-    title: "A valley called home",
-    category: "Landscapes",
-    author: "Danial",
-    description: "Mountain slopes and cultivated land in Malistan, Ghazni province.",
-    source: "https://commons.wikimedia.org/wiki/File:Malestan_1.jpg",
-  },
-  {
-    src: "/images/malistan-winter.webp",
-    title: "Winter in Malistan",
-    category: "Seasons",
-    author: "Mohammad Reza Rahmani",
-    description: "Snow settles over the highland landscape of Malistan, at 2,800 metres above sea level.",
-    source: "https://commons.wikimedia.org/wiki/File:مالستان.jpg",
-  },
-];
-
 export type Article = {
   title: string;
   eyebrow: string;
@@ -69,7 +50,7 @@ export const articles: Record<string, Article> = {
     eyebrow: "History & heritage",
     intro:
       "For centuries Malistan's mountain valleys have sheltered a resilient people. Understanding this land means listening to those who call it home—and reading the historical record with honesty and care.",
-    image: "/images/malistan-valley.webp",
+    image: "/images/malistan-rooftops-spring.webp",
     sections: [
       {
         title: "The highlands of Ghazni",
@@ -111,7 +92,7 @@ export const articles: Record<string, Article> = {
     eyebrow: "Places & landscape",
     intro:
       "At 2,800 metres above sea level, Malistan's landscape is one of the most dramatic in central Afghanistan. From the district centre to the furthest mountain village, every valley holds a story.",
-    image: "/images/malistan-valley.webp",
+    image: "/images/malistan-valley-panorama.webp",
     sections: [
       {
         title: "Mir Adina · میرآدینه — the district centre",
@@ -150,7 +131,7 @@ export const articles: Record<string, Article> = {
     eyebrow: "Culture & everyday life",
     intro:
       "Music, language and practical knowledge have connected Malistan's villages for generations. Culture here is not a relic—it is the air people breathe.",
-    image: "/images/malistan-valley.webp",
+    image: "/images/malistan-flock.webp",
     sections: [
       {
         title: "Hazaragi — a language of identity",
@@ -188,7 +169,7 @@ export const articles: Record<string, Article> = {
     eyebrow: "People of Malistan",
     intro:
       "A district's character is written in its people. These are some of the names that have given Malistan its voice—artists, scholars and community members whose stories deserve to be preserved.",
-    image: "/images/malistan-valley.webp",
+    image: "/images/malistan-poplar-road.webp",
     sections: [
       {
         title: "Safdar Ali Malistani · صفدرعلی مالستانی",
@@ -221,7 +202,7 @@ export const articles: Record<string, Article> = {
     eyebrow: "About the archive",
     intro:
       "An independent community archive, founded by Rohullah Mohammadi out of love for his hometown in Ghazni, Afghanistan. Built to last. Designed to grow.",
-    image: "/images/malistan-winter.webp",
+    image: "/images/malistan-clouds-valley.webp",
     sections: [
       {
         title: "Why this archive exists",

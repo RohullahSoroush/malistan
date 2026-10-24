@@ -7,25 +7,17 @@ import { ArrowRight, Images, Pause, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LiveCard } from "@/components/live/live-card";
 import { malistanClock, useNow } from "@/lib/live";
+import { photo } from "@/lib/photos";
 import { Motes } from "./motes";
 
 const SCENE_MS = 7000;
 const ease = [0.22, 1, 0.36, 1] as const;
 
 const scenes = [
-  {
-    image: "/images/malistan-valley.webp",
-    season: "Summer",
-    title: "The green valley",
-    alt: "Green fields, poplar trees and a village building beneath misty mountains in Malistan",
-  },
-  {
-    image: "/images/malistan-winter.webp",
-    season: "Winter",
-    title: "Snow on the peaks",
-    alt: "Snow covering the mountains and villages of Malistan in winter",
-  },
-];
+  { photo: photo("malistan-valley-panorama"), season: "Summer", title: "The green valley", position: "50% 34%", motes: "pollen" },
+  { photo: photo("malistan-autumn-valley"), season: "Autumn", title: "Poplars turn gold", position: "50% 28%", motes: "pollen" },
+  { photo: photo("malistan-winter"), season: "Winter", title: "Snow on the peaks", position: "50% 50%", motes: "snow" },
+] as const;
 
 export function Hero() {
   const [scene, setScene] = useState(0);
@@ -82,11 +74,13 @@ export function Hero() {
               >
                 <Image
                   className="hero__img"
-                  src={scenes[scene].image}
-                  alt={scenes[scene].alt}
+                  src={scenes[scene].photo.src}
+                  alt={scenes[scene].photo.description}
                   fill
-                  priority
+                  priority={scene === 0}
+                  placeholder={scenes[scene].photo.blur}
                   sizes="(max-width: 1240px) 100vw, 1200px"
+                  style={{ objectPosition: scenes[scene].position }}
                 />
               </motion.div>
             </AnimatePresence>
@@ -94,7 +88,7 @@ export function Hero() {
           <div className="hero__shade" />
           <motion.div className="hero__sun" style={{ x: sunX, y: sunY }} aria-hidden="true" />
           <div className="hero__beam" aria-hidden="true" />
-          {!reduced && <Motes variant={scene === 1 ? "snow" : "pollen"} />}
+          {!reduced && <Motes variant={scenes[scene].motes} />}
 
           <motion.div className="hero__live" {...rise(1)}>
             <LiveCard />
@@ -146,12 +140,13 @@ export function Hero() {
                 type="button"
                 className="scene-btn"
                 aria-pressed={scene === i}
+                aria-label={`${s.season}: ${s.title}`}
                 onClick={() => setScene(i)}
               >
                 <span className="scene-btn__thumb">
-                  <Image src={s.image} alt="" fill sizes="44px" />
+                  <Image src={s.photo.src} alt="" fill sizes="44px" placeholder={s.photo.blur} />
                 </span>
-                <span>
+                <span className="scene-btn__text">
                   <small>{s.season}</small>
                   <strong>{s.title}</strong>
                 </span>

@@ -114,12 +114,11 @@
 
 /* ── Gallery ───────────────────────────────────────────────── */
 .segmented {
-  display: inline-flex; gap: 4px;
+  display: inline-flex; flex-wrap: wrap; gap: 4px;
   max-width: 100%;
   margin-bottom: 28px;
   padding: 5px;
-  overflow-x: auto;
-  border-radius: 999px;
+  border-radius: 26px;
   background: var(--surface-muted);
   border: 1px solid var(--border);
 }
@@ -135,10 +134,14 @@
 .segmented button:hover,
 .segmented button[aria-pressed="true"] { color: var(--text); }
 .segmented__pill { position: absolute; inset: 0; border-radius: inherit; background: var(--surface); box-shadow: var(--shadow-sm); }
-.segmented__label { position: relative; z-index: 1; }
+.segmented__label { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 7px; }
+.segmented__count { min-width: 20px; padding: 1px 6px; border-radius: 999px; background: color-mix(in oklab, var(--text) 8%, transparent); font-size: 11px; font-weight: 800; color: var(--text-subtle); text-align: center; }
+.segmented button[aria-pressed="true"] .segmented__count { background: var(--brand-soft); color: var(--brand); }
 
-.gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+.masonry { columns: 3 300px; column-gap: 18px; }
+.masonry__item { break-inside: avoid; margin-bottom: 18px; }
 .photo-card {
+  width: 100%;
   display: block;
   padding: 8px;
   text-align: left;
@@ -149,7 +152,7 @@
   transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease);
 }
 .photo-card:hover { --lift: -5px; box-shadow: var(--shadow-lg); }
-.photo-card__media { display: block; position: relative; aspect-ratio: 4 / 3; border-radius: calc(var(--radius-lg) - 7px); overflow: hidden; background: var(--surface-muted); }
+.photo-card__media { display: block; position: relative; border-radius: calc(var(--radius-lg) - 7px); overflow: hidden; background: var(--surface-muted); }
 .photo-card__media img { object-fit: cover; transition: transform 1s var(--ease); }
 .photo-card:hover .photo-card__media img { transform: scale(1.06); }
 .photo-card__zoom {
@@ -167,7 +170,7 @@
 .photo-card__body { display: grid; gap: 4px; padding: 14px 12px 8px; }
 .photo-card__body small { font-size: 11.5px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brand); }
 .photo-card__body strong { font-family: var(--font-display); font-weight: 400; font-size: 24px; line-height: 1.15; }
-.photo-card__body p { font-size: 14px; color: var(--text-subtle); }
+.photo-card__credit { font-size: 13px; color: var(--text-subtle); }
 .gallery-page .note-card { margin-top: 28px; }
 
 .empty-state {
@@ -185,6 +188,7 @@
 .photo-dialog {
   width: min(1100px, 94vw);
   max-height: 92vh;
+  margin: auto;
   padding: 0;
   overflow: hidden;
   border: 0;
@@ -196,14 +200,38 @@
 .photo-dialog::backdrop { background: rgba(4, 8, 6, 0.72); backdrop-filter: blur(6px); }
 .photo-dialog[open] { animation: dialog-in 0.45s var(--ease); }
 @keyframes dialog-in { from { opacity: 0; transform: translateY(18px) scale(0.97); } }
-.lightbox-image { position: relative; aspect-ratio: 3 / 2; max-height: 72vh; background: #050806; }
+.lightbox-image { position: relative; height: min(72vh, 760px); background: #050806; }
+.lightbox-image__frame { position: absolute; inset: 0; }
+.lightbox-nav {
+  position: absolute; top: 50%; z-index: 2;
+  width: 46px; height: 46px; margin-top: -23px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: #111;
+  box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s var(--ease-spring), background-color 0.2s var(--ease);
+}
+.lightbox-nav:hover { background: #fff; transform: scale(1.08); }
+.lightbox-nav--prev { left: 14px; }
+.lightbox-nav--next { right: 14px; }
+.lightbox-count { display: block; margin-bottom: 6px; font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--brand); }
 .lightbox-image img { object-fit: contain; }
 .lightbox-caption { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 22px; }
 .lightbox-caption h2 { font-size: 26px; }
-.lightbox-caption p { font-size: 14px; color: var(--text-subtle); }
+.lightbox-caption > div { display: grid; gap: 4px; max-width: 70ch; }
+.lightbox-caption p { font-size: 14.5px; color: var(--text-muted); }
+.lightbox-caption .lightbox-credit { font-size: 13px; color: var(--text-subtle); }
+.lightbox-credit a { text-decoration: underline; text-underline-offset: 3px; }
 .dialog-close { position: absolute; top: 14px; right: 14px; z-index: 2; background: rgba(255, 255, 255, 0.92); color: #111; }
 .dialog-close:hover { background: #fff; color: #000; }
-@media (max-width: 700px) { .gallery-grid { grid-template-columns: 1fr; } }
+@media (max-width: 640px) {
+  .masonry { columns: 1; }
+  .lightbox-image { height: min(56vh, 520px); }
+  .lightbox-nav { width: 40px; height: 40px; margin-top: -20px; }
+  .lightbox-caption { padding: 16px; }
+  .lightbox-caption h2 { font-size: 22px; }
+}
 @media (max-width: 520px) {
   .segmented { display: grid; grid-template-columns: 1fr 1fr; width: 100%; border-radius: 20px; }
   .segmented button { border-radius: 15px; }

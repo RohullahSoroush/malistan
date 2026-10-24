@@ -1,36 +1,78 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useState } from "react";
-import { motion } from "motion/react";
-import { ArrowUpRight, Clapperboard, Expand, X } from "lucide-react";
-import { photos } from "@/lib/content";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { ArrowUpRight, ChevronLeft, ChevronRight, Clapperboard, Expand, X } from "lucide-react";
+import { photoCategories, photos, type Photo } from "@/lib/photos";
 import { Button } from "@/components/ui/button";
 
-const categories = ["All photographs", "Landscapes", "Seasons", "Films"];
+const ALL = "All";
+const FILMS = "Films";
+const filters = [ALL, ...photoCategories, FILMS];
 
 export function Gallery() {
-  const [category, setCategory] = useState(categories[0]);
-  const [selected, setSelected] = useState(0);
+  const [category, setCategory] = useState<string>(ALL);
+  const [openId, setOpenId] = useState<string | null>(null);
   const dialog = useRef<HTMLDialogElement>(null);
 
-  const visible = photos.filter((p) => category === categories[0] || p.category === category);
-  const photo = photos[selected];
+  const visible = category === ALL ? photos : photos.filter((p) => p.category === category);
+  const index = openId ? visible.findIndex((p) => p.id === openId) : -1;
+  const current: Photo | undefined = index >= 0 ? visible[index] : undefined;
+
+  const open = useCallback((id: string) => {
+    setOpenId(id);
+    if (!dialog.current?.open) dialog.current?.showModal();
+  }, []);
+
+  const step = useCallback(
+    (delta: number) => {
+      if (index < 0) return;
+      setOpenId(visible[(index + delta + visible.length) % visible.length].id);
+    },
+    [index, visible],
+  );
+
+  // Deep links such as /gallery#malistan-stream open that photograph.
+  useEffect(() => {
+    const fromHash = () => {
+      const id = decodeURIComponent(window.location.hash.slice(1));
+      if (id && photos.some((p) => p.id === id)) open(id);
+    };
+    fromHash();
+    window.addEventListener("hashchange", fromHash);
+    return () => window.removeEventListener("hashchange", fromHash);
+  }, [open]);
+
+  useEffect(() => {
+    if (!openId) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight") step(1);
+      if (e.key === "ArrowLeft") step(-1);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [openId, step]);
+
+  const count = (f: string) => (f === ALL ? photos.length : photos.filter((p) => p.category === f).length);
 
   return (
     <>
       <div className="segmented" role="group" aria-label="Filter photographs">
-        {categories.map((c) => (
-          <button key={c} type="button" aria-pressed={c === category} onClick={() => setCategory(c)}>
-            {c === category && (
+        {filters.map((f) => (
+          <button key={f} type="button" aria-pressed={f === category} onClick={() => setCategory(f)}>
+            {f === category && (
               <motion.span layoutId="segmented-pill" className="segmented__pill" transition={{ type: "spring", stiffness: 420, damping: 34 }} />
             )}
-            <span className="segmented__label">{c}</span>
+            <span className="segmented__label">
+              {f}
+              {f !== FILMS && <span className="segmented__count">{count(f)}</span>}
+            </span>
           </button>
         ))}
       </div>
 
-      {category === "Films" ? (
+      {category === FILMS ? (
         <div className="empty-state">
           <span className="empty-state__icon"><Clapperboard size={28} aria-hidden="true" /></span>
           <h2>Moving pictures are on the way</h2>
@@ -43,54 +85,101 @@ export function Gallery() {
           </Button>
         </div>
       ) : (
-        <div className="gallery-grid">
-          {visible.map((p) => (
-            <button
-              key={p.src}
-              type="button"
-              className="photo-card"
-              data-tilt
-              data-spotlight
-              onClick={() => {
-                setSelected(photos.indexOf(p));
-                dialog.current?.showModal();
-              }}
-            >
-              <span className="photo-card__media">
-                <Image src={p.src} alt={p.description} fill sizes="(max-width: 700px) 100vw, 50vw" />
-                <span className="photo-card__zoom" aria-hidden="true"><Expand size={18} /></span>
-              </span>
-              <span className="photo-card__body">
-                <small>{p.category}</small>
-                <strong>{p.title}</strong>
-                <p>Photograph by {p.author}</p>
-              </span>
-            </button>
-          ))}
+        <div className="masonry">
+          <AnimatePresence mode="popLayout" initial={false}>
+            {visible.map((p) => (
+              <motion.div
+                key={p.id}
+                className="masonry__item"
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.96 }}
+                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <button type="button" className="photo-card" data-tilt data-spotlight onClick={() => open(p.id)}>
+                  <span className="photo-card__media" style={{ aspectRatio: `${p.width} / ${p.height}` }}>
+                    <Image
+                      src={p.src}
+                      alt={p.description}
+                      fill
+                      placeholder={p.blur}
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    />
+                    <span className="photo-card__zoom" aria-hidden="true"><Expand size={18} /></span>
+                  </span>
+                  <span className="photo-card__body">
+                    <small>{p.category}</small>
+                    <strong>{p.title}</strong>
+                    <span className="photo-card__credit">{p.credit}</span>
+                  </span>
+                </button>
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       )}
 
       <dialog
         ref={dialog}
         className="photo-dialog"
-        aria-label={photo.title}
+        aria-label={current ? current.title : "Photograph"}
+        onClose={() => {
+          setOpenId(null);
+          if (window.location.hash) history.replaceState(null, "", window.location.pathname + window.location.search);
+        }}
         onClick={(e) => { if (e.target === dialog.current) dialog.current.close(); }}
       >
-        <button type="button" className="icon-btn dialog-close" aria-label="Close photograph" onClick={() => dialog.current?.close()}>
-          <X size={20} />
-        </button>
-        <div className="lightbox-image">
-          <Image src={photo.src} alt={photo.description} fill sizes="94vw" />
-        </div>
-        <div className="lightbox-caption">
-          <div>
-            <h2>{photo.title}</h2>
-            <p>{photo.author} · CC BY-SA 4.0</p>
-          </div>
-          <a className="link" href={photo.source} target="_blank" rel="noopener noreferrer">
-            View original <ArrowUpRight aria-hidden="true" />
-          </a>
-        </div>
+        {current && (
+          <>
+            <button type="button" className="icon-btn dialog-close" aria-label="Close photograph" onClick={() => dialog.current?.close()}>
+              <X size={20} />
+            </button>
+            <div className="lightbox-image">
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={current.id}
+                  className="lightbox-image__frame"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                >
+                  <Image src={current.src} alt={current.description} fill placeholder={current.blur} sizes="94vw" />
+                </motion.div>
+              </AnimatePresence>
+              {visible.length > 1 && (
+                <>
+                  <button type="button" className="lightbox-nav lightbox-nav--prev" aria-label="Previous photograph" onClick={() => step(-1)}>
+                    <ChevronLeft size={22} />
+                  </button>
+                  <button type="button" className="lightbox-nav lightbox-nav--next" aria-label="Next photograph" onClick={() => step(1)}>
+                    <ChevronRight size={22} />
+                  </button>
+                </>
+              )}
+            </div>
+            <div className="lightbox-caption">
+              <div>
+                <span className="lightbox-count">{index + 1} / {visible.length} · {current.category}</span>
+                <h2>{current.title}</h2>
+                <p>{current.description}</p>
+                <p className="lightbox-credit">
+                  {current.credit} ·{" "}
+                  {current.licenseUrl ? (
+                    <a href={current.licenseUrl} target="_blank" rel="noopener noreferrer">{current.license}</a>
+                  ) : (
+                    current.license
+                  )}
+                </p>
+              </div>
+              {current.source && (
+                <a className="link" href={current.source} target="_blank" rel="noopener noreferrer">
+                  View original <ArrowUpRight aria-hidden="true" />
+                </a>
+              )}
+            </div>
+          </>
+        )}
       </dialog>
     </>
   );
