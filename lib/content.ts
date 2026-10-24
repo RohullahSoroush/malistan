@@ -229,7 +229,7 @@ export const articles: Record<string, Article> = {
       },
       {
         title: "About the founder · Rohullah Mohammadi",
-        text: "Rohullah Mohammadi is a designer and technologist from Malistan, Ghazni. He built this archive from the ground up—researching, designing, writing and coding every element. His work on the archive reflects a conviction that the diaspora has a responsibility to document what it loves, and a belief that good design can make a community's story accessible to the world.",
+        text: "Rohullah Mohammadi is a software developer from Malistan, Ghazni, and the person who built this archive. He developed it from the ground up—researching, writing and engineering every part of it. His work on the archive reflects a conviction that the diaspora has a responsibility to document what it loves, and a belief that well-built software can make a community's story accessible to the world.",
       },
       {
         title: "A home for our shared memory",

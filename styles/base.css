@@ -1,0 +1,171 @@
+/* Base elements, layout primitives and motion utilities */
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 104px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100svh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+  transition: background-color 0.4s var(--ease), color 0.4s var(--ease);
+}
+
+/* The theme toggle animates with a view transition; skip CSS fades while it runs. */
+.theme-transition *,
+.theme-transition *::before,
+.theme-transition *::after { transition: none !important; }
+::view-transition-old(root),
+::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+::view-transition-new(root) { z-index: 2; }
+
+::selection { background: color-mix(in oklab, var(--brand) 28%, transparent); }
+
+img, svg { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
+:focus:not(:focus-visible) { outline: none; }
+
+h1, h2, h3, h4 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  color: var(--text);
+  text-wrap: balance;
+}
+p { margin: 0; text-wrap: pretty; }
+[lang="fa"] { font-family: var(--font-persian); }
+
+.container { width: min(100% - var(--gutter) * 2, var(--container)); margin-inline: auto; }
+.section { padding-block: var(--section); }
+.section--tight { padding-block: calc(var(--section) * 0.6); }
+.page { padding-top: calc(var(--header-h) + clamp(56px, 9vw, 104px)); padding-bottom: var(--section); }
+
+.skip-link {
+  position: fixed; left: 16px; top: -64px; z-index: 100;
+  padding: 10px 18px; border-radius: 999px;
+  background: var(--text); color: var(--bg); font-weight: 700;
+  transition: top 0.2s var(--ease);
+}
+.skip-link:focus { top: 16px; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+/* Emphasis inside display headings: brand italic with a soft hand-drawn underline */
+.display em,
+.section-title em,
+.page-hero__title em,
+.article-hero__title em {
+  font-style: italic;
+  color: var(--brand);
+  background: linear-gradient(transparent 64%, color-mix(in oklab, var(--accent) 24%, transparent) 64%, color-mix(in oklab, var(--accent) 24%, transparent) 84%, transparent 84%);
+  padding-inline: 0.02em 0.08em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* Scroll reveal (only hidden once JS is confirmed) */
+.js .reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
+}
+.js .reveal.is-visible { opacity: 1; transform: none; }
+
+/* Top reading progress */
+.reading-progress {
+  position: fixed; inset: 0 0 auto; height: 3px; z-index: 80;
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--brand), var(--accent));
+}
+
+/* Cursor-following light on cards */
+[data-spotlight] { position: relative; }
+[data-spotlight]::before {
+  content: "";
+  position: absolute; inset: 0; z-index: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    380px circle at var(--mx, 50%) var(--my, 50%),
+    color-mix(in oklab, var(--tone) 12%, transparent),
+    transparent 45%
+  );
+  opacity: 0;
+  transition: opacity 0.4s var(--ease);
+}
+[data-spotlight]:hover::before { opacity: 1; }
+
+/* Soft light that follows the cursor across the page background */
+.cursor-light {
+  position: fixed; top: 0; left: 0; z-index: -1;
+  width: 560px; height: 560px;
+  margin: -280px 0 0 -280px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, color-mix(in oklab, var(--brand) 13%, transparent), transparent 62%);
+  will-change: transform;
+}
+[data-theme="dark"] .cursor-light { background: radial-gradient(circle, color-mix(in oklab, var(--brand) 10%, transparent), transparent 62%); }
+@media (hover: none), (pointer: coarse) { .cursor-light { display: none; } }
+
+/* Gentle 3D tilt (pointer position sets --rx / --ry) */
+[data-tilt] {
+  transform: perspective(1100px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translate3d(0, var(--lift, 0px), 0);
+  transform-style: preserve-3d;
+}
+
+/* Headings wipe up into view as their section is revealed */
+.js .reveal :is(.section-title, .display, .cta__title) {
+  clip-path: inset(-0.3em -0.3em 100% -0.3em);
+  translate: 0 0.35em;
+  transition: clip-path 1.1s var(--ease) 0.08s, translate 1.1s var(--ease) 0.08s;
+}
+.js .reveal.is-visible :is(.section-title, .display, .cta__title) {
+  clip-path: inset(-0.3em -0.3em -0.4em -0.3em);
+  translate: 0 0;
+}
+
+/* Scroll-linked parallax on large photographs (progressive enhancement) */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .parallax-img img {
+      animation: photo-parallax linear both;
+      animation-timeline: view();
+      animation-range: cover;
+    }
+  }
+}
+@keyframes photo-parallax {
+  from { transform: translate3d(0, -7%, 0) scale(1.16); }
+  to { transform: translate3d(0, 7%, 0) scale(1.16); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .js .reveal { opacity: 1; transform: none; }
+}

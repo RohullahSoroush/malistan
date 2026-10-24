@@ -1,11 +1,3 @@
-/* Tailwind v4 reset layer — do not remove */
 @import "tailwindcss";
 
-@theme inline {
-  --color-forest: var(--forest);
-  --color-stone: var(--stone);
-  --font-sans: Manrope, system-ui, sans-serif;
-  --font-display: "DM Serif Display", Georgia, serif;
-}
-
-/* All design tokens, component styles, and theming are in appearance.css */
+/* The design system lives in /styles — tokens, base, layout, components, home, pages. */

@@ -1,55 +1,63 @@
+import type { Metadata, Viewport } from "next";
 import { siteUrl } from "@/lib/site-url";
-import type { Metadata } from "next";
-import { Header, Footer } from "@/components/site";
-import { Experience } from "@/components/experience";
+import { Ambient } from "@/components/layout/ambient";
+import { Experience } from "@/components/layout/experience";
+import { Footer } from "@/components/layout/footer";
+import { Header } from "@/components/layout/header";
 import "./globals.css";
-import "./editorial.css";
-import "./appearance.css";
-const site = siteUrl;
-// Apply the saved preference before first paint; the switcher owns subsequent changes.
-const themeScript = `(function(){var p='system';try{p=localStorage.getItem('malistan-theme')||'system'}catch(e){}var dark=p==='dark'||(p!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.dataset.theme=dark?'dark':'light'})()`;
+import "@/styles/tokens.css";
+import "@/styles/base.css";
+import "@/styles/layout.css";
+import "@/styles/components.css";
+import "@/styles/home.css";
+import "@/styles/pages.css";
+
+// Runs before first paint so the saved theme never flashes.
+const themeScript = `(function(){var d=document.documentElement;d.classList.add('js');var p=null;try{p=localStorage.getItem('malistan-theme')}catch(e){}var dark=p==='dark'||(p!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches);d.dataset.theme=dark?'dark':'light'})()`;
+
 export const metadata: Metadata = {
-  metadataBase: new URL(site),
+  metadataBase: new URL(siteUrl),
   title: {
     default: "Malistan — A Place. A People. A Story.",
     template: "%s | Malistan Archive",
   },
   description:
-    "Discover Malistan (مالستان), Ghazni, Afghanistan. Explore its mountain landscapes, history, Hazara cultural heritage, people and a growing community photo archive.",
+    "Discover Malistan (مالستان), Ghazni, Afghanistan — mountain landscapes at 2,800 m, Hazara history, Hazaragi music and culture, its people, and a growing photo archive. Founded by Rohullah Mohammadi.",
+  keywords: ["Malistan", "Malestan", "مالستان", "Ghazni", "Afghanistan", "Hazarajat", "Hazara", "Mir Adina", "Hazaragi", "Rohullah Mohammadi"],
+  authors: [{ name: "Rohullah Mohammadi", url: "https://rohullah.me" }],
+  creator: "Rohullah Mohammadi",
+  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     locale: "en_US",
     siteName: "Malistan Archive",
     title: "Malistan — A Place. A People. A Story.",
-    description:
-      "A community archive celebrating Malistan, its people and its stories.",
-    images: [
-      {
-        url: "/images/malistan-valley.webp",
-        width: 1280,
-        height: 853,
-        alt: "The mountainous landscape of Malistan, Afghanistan",
-      },
-    ],
+    description: "A community archive celebrating Malistan, Ghazni — its landscapes, culture and people.",
+    images: [{ url: "/images/malistan-valley.webp", width: 1280, height: 853, alt: "The mountain valley of Malistan, Afghanistan" }],
   },
   twitter: { card: "summary_large_image" },
   robots: { index: true, follow: true },
   icons: { icon: "/icon.svg" },
 };
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fbf7f1" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0f17" },
+  ],
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
-      <head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body>
-        <a className="skip-link" href="#main">
-          Skip to content
-        </a>
-        <Header />
+        <a className="skip-link" href="#main">Skip to content</a>
+        <Ambient />
         <Experience />
+        <Header />
         {children}
         <Footer />
       </body>
