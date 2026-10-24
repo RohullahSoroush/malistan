@@ -15,89 +15,84 @@ import { ArrowDown, ArrowUpRight, MapPin, Pause, Play } from "lucide-react";
 const landscapes = [
   {
     image: "/images/malistan-valley.webp",
-    label: "The green valleys",
+    label: "The green valleys · Summer",
     season: "Valley",
-    alt: "Green fields, village buildings and mountains in Malistan",
+    alt: "Green fields, village buildings and mountains stretching across Malistan valley",
   },
   {
     image: "/images/malistan-winter.webp",
-    label: "A quieter kind of winter",
+    label: "A quieter world · Winter",
     season: "Winter",
-    alt: "Winter snow blankets the mountains and villages of Malistan",
+    alt: "Snow blankets the mountains and villages of Malistan in deep winter",
   },
 ];
 
+const letters = "MALISTAN".split("");
+
 export function CinematicHero() {
-  const [scene, setScene] = useState(1);
+  const [scene, setScene] = useState(0);
   const [paused, setPaused] = useState(false);
   const ref = useRef<HTMLElement>(null);
   const reduced = useReducedMotion();
+
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"],
   });
-  const y = useTransform(
-    scrollYProgress,
-    [0, 1],
-    [0, reduced || paused ? 0 : 180],
-  );
-  const titleY = useTransform(
-    scrollYProgress,
-    [0, 1],
-    [0, reduced || paused ? 0 : -80],
-  );
+  const bgY  = useTransform(scrollYProgress, [0, 1], [0, reduced || paused ? 0 : 180]);
+  const hY   = useTransform(scrollYProgress, [0, 1], [0, reduced || paused ? 0 : -70]);
+
   return (
     <section className="cinema-hero" ref={ref} aria-label="Welcome to Malistan">
-      <motion.div className="cinema-landscape" style={{ y }}>
+      {/* Parallax background */}
+      <motion.div className="cinema-landscape" style={{ y: bgY }}>
         <AnimatePresence initial={false}>
           <motion.div
             key={scene}
             className="cinema-scene"
             initial={{ opacity: 0, scale: 1.06 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{
-              duration: reduced ? 0 : 1.1,
-              ease: [0.22, 1, 0.36, 1],
-            }}
+            exit={{ opacity: 0, scale: 1.04 }}
+            transition={{ duration: reduced ? 0 : 1.2, ease: [0.22, 1, 0.36, 1] }}
           >
             <Image
               src={landscapes[scene].image}
               alt={landscapes[scene].alt}
-              fill
-              priority
-              loading="eager"
-              sizes="100vw"
+              fill priority loading="eager" sizes="100vw"
             />
           </motion.div>
         </AnimatePresence>
       </motion.div>
       <div className="cinema-scrim" />
+
+      {/* Top info bar */}
       <div className="cinema-topline">
         <span>
-          <span className="live-dot" /> AN OPEN ARCHIVE OF HOME
+          <span className="live-dot" aria-hidden="true" />
+          AN OPEN ARCHIVE OF HOME
         </span>
         <span>
-          GHAZNI, AFGHANISTAN <ArrowUpRight size={13} />
+          GHAZNI PROVINCE, AFGHANISTAN <ArrowUpRight size={11} aria-hidden="true" />
         </span>
       </div>
-      <motion.div className="cinema-heading" style={{ y: titleY }}>
+
+      {/* Main headline */}
+      <motion.div className="cinema-heading" style={{ y: hY }}>
         <div className="cinema-kicker">
           <span>THE PLACE WE CARRY WITH US</span>
-          <span lang="fa" dir="rtl">
-            سرزمین خاطره‌ها
-          </span>
+          <span lang="fa" dir="rtl">سرزمین خاطره‌ها</span>
         </div>
+
         <h1 aria-label="Malistan">
-          {"MALISTAN".split("").map((letter, i) => (
+          {letters.map((letter, i) => (
             <motion.span
               aria-hidden="true"
               key={i}
-              initial={reduced ? false : { y: "110%", rotate: 5 }}
-              animate={{ y: 0, rotate: 0 }}
+              initial={reduced ? false : { y: "115%", rotate: 4, opacity: 0 }}
+              animate={{ y: "0%", rotate: 0, opacity: 1 }}
               transition={{
-                duration: 1.15,
-                delay: 0.1 + i * 0.065,
+                duration: 1.2,
+                delay: 0.08 + i * 0.06,
                 ease: [0.22, 1, 0.36, 1],
               }}
             >
@@ -105,6 +100,7 @@ export function CinematicHero() {
             </motion.span>
           ))}
         </h1>
+
         <div className="cinema-subtitle">
           <span>
             A place. A people. <em>A feeling.</em>
@@ -114,55 +110,54 @@ export function CinematicHero() {
           </span>
         </div>
       </motion.div>
+
+      {/* Bottom row */}
       <div className="cinema-bottom">
         <Link href="#intro" className="round-explore">
+          <span aria-hidden="true"><ArrowDown size={20} /></span>
           <span>
-            <ArrowDown size={22} />
-          </span>
-          <span>
-            Step into
-            <br />
-            our story
+            Step into<br />our story
           </span>
         </Link>
+
         <p>
-          Somewhere between the mountains,
-          <br />
-          you find a little of yourself.
+          Between the mountains,<br />
+          something calls you home.
         </p>
+
         <div className="scene-switcher">
-          <span className="scene-label">A DIFFERENT PERSPECTIVE</span>
+          <span className="scene-label">CHANGE THE VIEW</span>
           <div>
             {landscapes.map((s, i) => (
               <button
-                aria-pressed={scene === i}
                 key={s.season}
+                aria-pressed={scene === i}
                 className={scene === i ? "active" : ""}
                 onClick={() => setScene(i)}
               >
                 <span>0{i + 1}</span>
                 {s.season}
-                <ArrowUpRight size={13} />
+                <ArrowUpRight size={12} aria-hidden="true" />
               </button>
             ))}
           </div>
         </div>
       </div>
+
+      {/* Caption bar */}
       <div className="cinema-caption">
         <span>
-          <MapPin size={12} />
+          <MapPin size={11} aria-hidden="true" />
           {landscapes[scene].label} · Malistan
         </span>
         <button
           className="motion-toggle"
           onClick={() => setPaused(!paused)}
           aria-pressed={paused}
-          aria-label={
-            paused ? "Enable landscape motion" : "Pause landscape motion"
-          }
+          aria-label={paused ? "Enable parallax motion" : "Pause parallax motion"}
         >
-          {paused ? <Play size={12} /> : <Pause size={12} />}
-          <span>{paused ? "Motion off" : "Motion on"}</span>
+          {paused ? <Play size={11} aria-hidden="true" /> : <Pause size={11} aria-hidden="true" />}
+          <span>{paused ? "Motion paused" : "Motion live"}</span>
         </button>
       </div>
     </section>

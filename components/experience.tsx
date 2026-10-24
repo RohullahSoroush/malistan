@@ -1,57 +1,55 @@
 "use client";
+
 import { motion, useScroll, useSpring, useReducedMotion } from "motion/react";
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { animate, stagger, scroll } from "motion";
 
 export function Experience() {
-  const path = usePathname();
+  const path    = usePathname();
   const reduced = useReducedMotion();
   const { scrollYProgress } = useScroll();
-  const progress = useSpring(scrollYProgress, { stiffness: 150, damping: 30 });
+  const progress = useSpring(scrollYProgress, { stiffness: 180, damping: 35 });
+
   useEffect(() => {
     if (reduced) return;
-    const elements = document.querySelectorAll(
-      "main > .article-hero > *, main.source-page > h1, main.gallery-page > h1",
+
+    /* Page-enter stagger for article / gallery / source hero elements */
+    const heroEls = document.querySelectorAll(
+      "main > .article-hero > *, main.source-page > h1, main.gallery-page > h1, main.gallery-page > .lead, main.source-page > .lead",
     );
-    const controls = elements.length
+    const ctrl = heroEls.length
       ? animate(
-          elements,
-          { opacity: [0.2, 1], y: [35, 0] },
-          { duration: 0.85, delay: stagger(0.08), ease: [0.22, 1, 0.36, 1] },
+          heroEls,
+          { opacity: [0, 1], y: [36, 0], filter: ["blur(6px)", "blur(0)"] },
+          { duration: 0.8, delay: stagger(0.07), ease: [0.22, 1, 0.36, 1] },
         )
       : null;
-    const parallax = [
-      ...document.querySelectorAll<HTMLElement>(
-        ".landscape-photo, .gallery-preview",
-      ),
+
+    /* Subtle scroll-parallax on images inside landscape / gallery containers */
+    const parallaxCleanups = [
+      ...document.querySelectorAll<HTMLElement>(".landscape-photo, .gallery-preview"),
     ].map((container) => {
-      const image = container.querySelector("img");
-      if (!image) return () => {};
-      const animation = animate(
-        image,
-        { y: ["-7%", "7%"], scale: [1.16, 1.16] },
-        { ease: "linear" },
-      );
-      const stop = scroll(animation, {
-        target: container,
-        offset: ["start end", "end start"],
-      });
-      return () => {
-        stop();
-        animation.cancel();
-      };
+      const img = container.querySelector("img");
+      if (!img) return () => {};
+      const anim = animate(img, { y: ["-6%", "6%"], scale: [1.14, 1.14] }, { ease: "linear" });
+      const stop = scroll(anim, { target: container, offset: ["start end", "end start"] });
+      return () => { stop(); anim.cancel(); };
     });
+
     return () => {
-      controls?.stop();
-      parallax.forEach((stop) => stop());
+      ctrl?.stop();
+      parallaxCleanups.forEach((fn) => fn());
     };
   }, [path, reduced]);
+
   return (
     <motion.div
       className="reading-progress"
       style={{ scaleX: progress }}
       aria-hidden="true"
+      role="progressbar"
+      aria-label="Reading progress"
     />
   );
 }
