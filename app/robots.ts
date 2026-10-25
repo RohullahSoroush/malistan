@@ -1,10 +1,12 @@
-import { siteUrl } from "@/lib/site-url";
 import type { MetadataRoute } from "next";
+import { siteUrl } from "@/lib/site-url";
+
+export const dynamic = "force-static";
+
 export default function robots(): MetadataRoute.Robots {
-  const base = siteUrl;
   return {
     rules: { userAgent: "*", allow: "/" },
-    sitemap: base + "/sitemap.xml",
+    sitemap: `${siteUrl}/sitemap.xml`,
+    host: siteUrl,
   };
 }
-export const dynamic = "force-static";

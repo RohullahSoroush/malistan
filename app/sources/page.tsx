@@ -2,21 +2,20 @@ import type { Metadata } from "next";
 import { ArrowUpRight, Camera, Map } from "lucide-react";
 import { sources } from "@/lib/content";
 import { photos } from "@/lib/photos";
+import { graph, pageMetadata, sourcesGraph } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/json-ld";
 
 const shared = photos.filter((p) => !p.source);
 const commons = photos.filter((p) => p.source);
 import { PageHero, SectionHeader } from "@/components/ui/section";
 import { Reveal } from "@/components/ui/reveal";
 
-export const metadata: Metadata = {
-  title: "Sources & photo credits",
-  description: "The research, historical records and openly licensed photography behind the Malistan Archive.",
-  alternates: { canonical: "/sources" },
-};
+export const metadata: Metadata = pageMetadata("sources", "/sources");
 
 export default function SourcesPage() {
   return (
     <main id="main" className="page">
+      <JsonLd data={graph(sourcesGraph())} />
       <div className="container">
         <PageHero
           eyebrow="Transparency is part of the story"

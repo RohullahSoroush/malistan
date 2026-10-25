@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import Image from "next/image";
 import { LiveClock } from "@/components/live/live-card";
+import { founder } from "@/lib/seo";
 import { Brand } from "./brand";
 
 const columns = [
@@ -46,7 +48,11 @@ export function Footer() {
               connected through its stories, built for its people everywhere.
             </p>
             <a className="signature" href="https://rohullah.me" target="_blank" rel="noopener noreferrer">
-              <span className="avatar"><span>RM</span></span>
+              <span className="avatar">
+                <span>
+                  <Image src={founder.avatar} alt="" width={46} height={46} placeholder={founder.blur} />
+                </span>
+              </span>
               <span>
                 <strong>Rohullah Mohammadi</strong>
                 <small>Software developer · Founder</small>

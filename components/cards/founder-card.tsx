@@ -1,5 +1,7 @@
+import Image from "next/image";
 import { ArrowUpRight, BookOpen } from "lucide-react";
 import { LogoMark } from "@/components/icons";
+import { founder } from "@/lib/seo";
 import { Button } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/section";
 
@@ -9,11 +11,16 @@ export function FounderCard({ id, showStoryLink = true }: { id?: string; showSto
       <span className="founder__halo" aria-hidden="true" />
 
       <div className="founder__aside">
-        <div className="founder__portrait" aria-hidden="true">
-          <span className="topo" />
-          <span className="founder__monogram">RM</span>
-          <LogoMark className="founder__mark" />
-        </div>
+        <figure className="founder__portrait">
+          <Image
+            src={founder.photo}
+            alt="Portrait of Rohullah Mohammadi, software developer and founder of the Malistan Archive"
+            fill
+            placeholder={founder.blur}
+            sizes="(max-width: 860px) 112px, 300px"
+          />
+          <span className="brand__mark founder__badge" aria-hidden="true"><LogoMark /></span>
+        </figure>
         <div className="founder__name">
           <strong>Rohullah Mohammadi</strong>
           <small>Software developer · Founder of the Malistan Archive</small>

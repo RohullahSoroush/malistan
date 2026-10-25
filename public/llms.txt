@@ -1,0 +1,23 @@
+# Malistan Archive
+
+> An independent community archive about Malistan (also written Malestan; Dari: مالستان), a mountain district at about 2,800 metres in Ghazni Province, central Afghanistan, and part of the historic Hazara homeland of Hazarajat. Founded and built by Rohullah Mohammadi, a software developer from Malistan (https://rohullah.me).
+
+The archive links its sources on every page, labels historical figures with their source date, and records disputed accounts rather than choosing one version.
+
+## Pages
+
+- [Home](https://malistan.org): Overview of Malistan — key facts, seasons, photographs, location and the founder.
+- [History & heritage](https://malistan.org/history): Hazarajat, the 2003 UNHCR district profile, displacement and return, post-2001 rebuilding.
+- [Places & landscape](https://malistan.org/places): Mir Adina (district centre), Maknak, Now Deh, Pashia, Sheer Dagh, seasons and neighbouring districts.
+- [Culture & everyday life](https://malistan.org/culture): Hazaragi, folk music, Abay Mirza, Nammad and Glem weaving, women's agricultural knowledge, Nowruz.
+- [People of Malistan](https://malistan.org/people): Safdar Ali Malistani, Abay Mirza, scholars and educators, notes on attribution.
+- [About the archive](https://malistan.org/about): Purpose, editorial promise, the founder, and how to contribute.
+- [Photo archive](https://malistan.org/gallery): Photographs of Malistan's valleys, fields, streams and seasons with credits.
+- [Sources & credits](https://malistan.org/sources): Every source used, with dates and notes, plus photo and map credits.
+
+## Key facts
+
+- Location: Ghazni Province, Afghanistan; approximate centre 33°18′N, 67°10′E.
+- Elevation: about 2,800 metres. Area: roughly 1,978 km².
+- Population: predominantly Hazara (estimates of 90% or more); language Hazaragi, a variety of Dari.
+- Neighbours (per the 2003 UNHCR profile): Ajristan to the north, Nawur to the northeast, Jaghori to the south, Uruzgan province to the southwest.

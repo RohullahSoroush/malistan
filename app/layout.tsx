@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { siteUrl } from "@/lib/site-url";
+import { founder, graph, pages, siteGraph, SITE_NAME } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/json-ld";
 import { Ambient } from "@/components/layout/ambient";
 import { Experience } from "@/components/layout/experience";
 import { Footer } from "@/components/layout/footer";
@@ -15,34 +17,54 @@ import "@/styles/pages.css";
 // Runs before first paint so the saved theme never flashes.
 const themeScript = `(function(){var d=document.documentElement;d.classList.add('js');var p=null;try{p=localStorage.getItem('malistan-theme')}catch(e){}var dark=p==='dark'||(p!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches);d.dataset.theme=dark?'dark':'light'})()`;
 
+const home = pages.home;
+const googleVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
+const bingVerification = process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION;
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: {
-    default: "Malistan — A Place. A People. A Story.",
-    template: "%s | Malistan Archive",
-  },
-  description:
-    "Discover Malistan (مالستان), Ghazni, Afghanistan — mountain landscapes at 2,800 m, Hazara history, Hazaragi music and culture, its people, and a growing photo archive. Founded by Rohullah Mohammadi.",
-  keywords: ["Malistan", "Malestan", "مالستان", "Ghazni", "Afghanistan", "Hazarajat", "Hazara", "Mir Adina", "Hazaragi", "Rohullah Mohammadi"],
-  authors: [{ name: "Rohullah Mohammadi", url: "https://rohullah.me" }],
-  creator: "Rohullah Mohammadi",
-  alternates: { canonical: "/" },
+  title: { default: home.title, template: `%s | ${SITE_NAME}` },
+  description: home.description,
+  applicationName: SITE_NAME,
+  keywords: [
+    "Malistan", "Malestan", "مالستان", "Malistan district", "Malistan Ghazni", "Ghazni", "Afghanistan",
+    "Hazarajat", "Hazara", "Hazaragi", "Mir Adina", "Maknak", "Now Deh", "Safdar Ali Malistani", "Rohullah Mohammadi",
+  ],
+  authors: [{ name: founder.name, url: founder.url }],
+  creator: founder.name,
+  publisher: SITE_NAME,
+  category: "culture",
+  formatDetection: { telephone: false, email: false, address: false },
   openGraph: {
     type: "website",
     locale: "en_US",
-    siteName: "Malistan Archive",
-    title: "Malistan — A Place. A People. A Story.",
-    description: "A community archive celebrating Malistan, Ghazni — its landscapes, culture and people.",
-    images: [{ url: "/images/og-malistan.jpg", width: 1200, height: 630, alt: "Poplar groves and village homes beneath the mountains of Malistan, Ghazni" }],
+    siteName: SITE_NAME,
+    title: home.title,
+    description: home.description,
+    images: [{ url: home.image, width: 1200, height: 630, alt: home.imageAlt, type: "image/jpeg" }],
   },
-  twitter: { card: "summary_large_image" },
-  robots: { index: true, follow: true },
+  twitter: { card: "summary_large_image", title: home.title, description: home.description, images: [home.image] },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
+  },
+  ...(googleVerification || bingVerification
+    ? {
+        verification: {
+          ...(googleVerification ? { google: googleVerification } : {}),
+          ...(bingVerification ? { other: { "msvalidate.01": bingVerification } } : {}),
+        },
+      }
+    : {}),
 };
 
 export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fbf7f1" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0f17" },
+    { media: "(prefers-color-scheme: light)", color: "#faf8f4" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b110e" },
   ],
 };
 
@@ -51,8 +73,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <link rel="preload" href="/fonts/display.ttf" as="font" type="font/ttf" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/manrope-regular.ttf" as="font" type="font/ttf" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://api.open-meteo.com" crossOrigin="anonymous" />
       </head>
       <body>
+        <JsonLd data={graph(siteGraph())} />
         <a className="skip-link" href="#main">Skip to content</a>
         <Ambient />
         <Experience />

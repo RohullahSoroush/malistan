@@ -147,12 +147,14 @@
 .avatar > span {
   position: absolute; inset: 2.5px;
   display: grid; place-items: center;
+  overflow: hidden;
   border-radius: 50%;
   background: var(--surface);
   font: 800 14px var(--font-sans);
   letter-spacing: 0.02em;
   color: var(--text);
 }
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
 @keyframes spin-angle { to { --angle: 360deg; } }
 
 .signature {
@@ -270,23 +272,24 @@ a.signature:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
 [data-theme="dark"] .founder__halo { opacity: 0.22; }
 .founder__aside { position: relative; z-index: 1; display: grid; align-content: start; gap: 18px; }
 .founder__portrait {
-  --mark-sun: var(--accent);
-  --mark-cut: var(--surface-muted);
   position: relative;
-  isolation: isolate;
   aspect-ratio: 1;
-  display: grid; place-items: center;
+  margin: 0;
   border-radius: 26px;
   overflow: hidden;
-  background:
-    radial-gradient(circle at 25% 20%, var(--accent-soft), transparent 60%),
-    radial-gradient(circle at 85% 90%, color-mix(in oklab, var(--brand) 22%, transparent), transparent 60%),
-    var(--surface-muted);
-  box-shadow: inset 0 0 0 1px var(--border);
+  background: #fff;
+  box-shadow: 0 18px 40px -22px rgba(20, 32, 24, 0.45), 0 0 0 1px var(--border);
 }
-.founder__portrait .topo { color: var(--brand); opacity: 0.12; }
-.founder__monogram { font-family: var(--font-display); font-size: clamp(64px, 8vw, 104px); line-height: 1; letter-spacing: -0.04em; color: var(--text); }
-.founder__mark { position: absolute; left: 50%; bottom: 13%; width: 44px; height: 44px; transform: translateX(-50%); color: var(--brand); }
+.founder__portrait img { object-fit: cover; object-position: 50% 20%; transition: transform 1s var(--ease); }
+.founder:hover .founder__portrait img { transform: scale(1.04); }
+.founder__portrait::after {
+  content: "";
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(20, 32, 24, 0.08);
+  pointer-events: none;
+}
+.founder__badge { position: absolute; right: 12px; bottom: 12px; z-index: 1; width: 44px; height: 44px; border: 3px solid var(--surface); }
 .founder__name strong { display: block; font-family: var(--font-display); font-weight: 400; font-size: 28px; line-height: 1.1; }
 .founder__name small { display: block; margin-top: 6px; font-size: 13.5px; color: var(--text-subtle); }
 .founder__links { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -305,15 +308,13 @@ a.signature:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
 .founder__body > p { color: var(--text-muted); font-size: 16px; }
 .prose .founder { grid-template-columns: 1fr; }
 .prose .founder__aside { grid-template-columns: 112px 1fr; align-items: center; }
-.prose .founder__monogram { font-size: 42px; }
-.prose .founder__mark { display: none; }
+.prose .founder__badge { display: none; }
 .prose .founder__links { grid-column: 1 / -1; }
 @media (max-width: 860px) {
   .founder { grid-template-columns: 1fr; }
   .founder__aside { grid-template-columns: 96px 1fr; align-items: center; }
   .founder__portrait { border-radius: 22px; }
-  .founder__monogram { font-size: 38px; }
-  .founder__mark { display: none; }
+  .founder__badge { display: none; }
   .founder__links { grid-column: 1 / -1; }
 }
 

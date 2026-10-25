@@ -10,6 +10,8 @@ import { Eyebrow, SectionHeader } from "@/components/ui/section";
 import { Reveal } from "@/components/ui/reveal";
 import { articles, sources } from "@/lib/content";
 import { photos } from "@/lib/photos";
+import { articleGraph, graph, pageMetadata, pages } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/json-ld";
 
 export function generateStaticParams() {
   return Object.keys(articles).map((slug) => ({ slug }));
@@ -17,21 +19,8 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const a = articles[slug];
-  if (!a) return { title: "Page not found" };
-  return {
-    title: a.eyebrow,
-    description: a.intro,
-    alternates: { canonical: `/${slug}` },
-    openGraph: {
-      type: "article",
-      siteName: "Malistan Archive",
-      url: `/${slug}`,
-      title: `${a.eyebrow} | Malistan Archive`,
-      description: a.intro,
-      images: [{ url: a.image, alt: photos.find((p) => p.src === a.image)?.description ?? "Malistan, Ghazni, Afghanistan" }],
-    },
-  };
+  if (!articles[slug] || !pages[slug]) return { title: "Page not found" };
+  return pageMetadata(slug, `/${slug}`, { type: "article" });
 }
 
 function slugify(value: string) {
@@ -51,6 +40,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
   return (
     <main id="main" className="page">
+      <JsonLd data={graph(articleGraph(slug))} />
       <div className="container">
         <header className="article-hero">
           <Link href="/" className="back-link"><ArrowLeft size={15} aria-hidden="true" /> Back home</Link>

@@ -1,6 +1,14 @@
+import type { Metadata } from "next";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/section";
+
+export const metadata: Metadata = {
+  title: "Page not found",
+  description: "This page could not be found on the Malistan Archive.",
+  robots: { index: false, follow: true },
+  alternates: { canonical: null },
+};
 
 export default function NotFound() {
   return (

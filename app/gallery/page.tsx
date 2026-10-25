@@ -2,18 +2,15 @@ import type { Metadata } from "next";
 import { Camera } from "lucide-react";
 import { Gallery } from "@/components/gallery";
 import { PageHero } from "@/components/ui/section";
+import { JsonLd } from "@/components/seo/json-ld";
+import { galleryGraph, graph, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Photo & film archive",
-  description:
-    "Photographs of Malistan, Ghazni — poplar-lined valleys, mountain streams, fields, flocks and the turning seasons, with full credits.",
-  openGraph: { images: [{ url: "/images/malistan-autumn-valley.webp", width: 1080, height: 1080, alt: "Poplars turning gold in autumn in Malistan" }] },
-  alternates: { canonical: "/gallery" },
-};
+export const metadata: Metadata = pageMetadata("gallery", "/gallery");
 
 export default function GalleryPage() {
   return (
     <main id="main" className="page gallery-page">
+      <JsonLd data={graph(galleryGraph())} />
       <div className="container">
         <PageHero
           eyebrow="Photo & film archive"
