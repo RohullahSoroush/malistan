@@ -63,7 +63,7 @@ export function DistrictMap({ lat = 33.2953, lon = 67.1689 }: { lat?: number; lo
           </div>
 
           <div className="map-actions">
-            <button type="button" className="btn btn--primary" onClick={() => setRequested(true)} disabled={requested}>
+            <button type="button" className="btn btn--primary" data-sound="pop" onClick={() => setRequested(true)} disabled={requested}>
               {requested ? "Loading map…" : <>Load interactive map <MapIcon aria-hidden="true" /></>}
             </button>
             <span className="map-note">Illustration · not a boundary map</span>

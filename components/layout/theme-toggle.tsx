@@ -80,6 +80,7 @@ export function ThemeToggle() {
       aria-label="Dark mode"
       title={dark ? "Switch to light mode" : "Switch to dark mode"}
       className="theme-toggle"
+      data-sound={dark ? "theme-light" : "theme-dark"}
       onClick={toggle}
     >
       <span className="theme-toggle__track" aria-hidden="true">

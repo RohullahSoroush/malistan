@@ -6,6 +6,7 @@ import { Ambient } from "@/components/layout/ambient";
 import { Experience } from "@/components/layout/experience";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
+import { SoundLayer } from "@/components/sound/sound-layer";
 import "./globals.css";
 import "@/styles/tokens.css";
 import "@/styles/base.css";
@@ -82,6 +83,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <a className="skip-link" href="#main">Skip to content</a>
         <Ambient />
         <Experience />
+        <SoundLayer />
         <Header />
         {children}
         <Footer />

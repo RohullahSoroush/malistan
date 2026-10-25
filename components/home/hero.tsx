@@ -139,6 +139,7 @@ export function Hero() {
                 key={s.season}
                 type="button"
                 className="scene-btn"
+                data-sound="scene"
                 aria-pressed={scene === i}
                 aria-label={`${s.season}: ${s.title}`}
                 onClick={() => setScene(i)}

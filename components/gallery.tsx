@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { ArrowUpRight, ChevronLeft, ChevronRight, Clapperboard, Expand, X } from "lucide-react";
 import { photoCategories, photos, type Photo } from "@/lib/photos";
 import { Button } from "@/components/ui/button";
+import { playSound } from "@/lib/sound/store";
 
 const ALL = "All";
 const FILMS = "Films";
@@ -47,8 +48,8 @@ export function Gallery() {
   useEffect(() => {
     if (!openId) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "ArrowRight") step(1);
-      if (e.key === "ArrowLeft") step(-1);
+      if (e.key === "ArrowRight") { step(1); playSound("swish"); }
+      if (e.key === "ArrowLeft") { step(-1); playSound("swish"); }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -59,8 +60,8 @@ export function Gallery() {
   return (
     <>
       <div className="segmented" role="group" aria-label="Filter photographs">
-        {filters.map((f) => (
-          <button key={f} type="button" aria-pressed={f === category} onClick={() => setCategory(f)}>
+        {filters.map((f, i) => (
+          <button key={f} type="button" aria-pressed={f === category} data-sound="tick" data-sound-step={i} onClick={() => setCategory(f)}>
             {f === category && (
               <motion.span layoutId="segmented-pill" className="segmented__pill" transition={{ type: "spring", stiffness: 420, damping: 34 }} />
             )}
@@ -96,7 +97,7 @@ export function Gallery() {
                 exit={{ opacity: 0, scale: 0.96 }}
                 transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
               >
-                <button type="button" className="photo-card" data-tilt data-spotlight onClick={() => open(p.id)}>
+                <button type="button" className="photo-card" data-tilt data-spotlight data-sound="shutter" onClick={() => open(p.id)}>
                   <span className="photo-card__media" style={{ aspectRatio: `${p.width} / ${p.height}` }}>
                     <Image
                       src={p.src}
@@ -124,6 +125,7 @@ export function Gallery() {
         className="photo-dialog"
         aria-label={current ? current.title : "Photograph"}
         onClose={() => {
+          playSound("close");
           setOpenId(null);
           if (window.location.hash) history.replaceState(null, "", window.location.pathname + window.location.search);
         }}
@@ -131,7 +133,7 @@ export function Gallery() {
       >
         {current && (
           <>
-            <button type="button" className="icon-btn dialog-close" aria-label="Close photograph" onClick={() => dialog.current?.close()}>
+            <button type="button" className="icon-btn dialog-close" aria-label="Close photograph" data-sound="none" onClick={() => dialog.current?.close()}>
               <X size={20} />
             </button>
             <div className="lightbox-image">
@@ -149,10 +151,10 @@ export function Gallery() {
               </AnimatePresence>
               {visible.length > 1 && (
                 <>
-                  <button type="button" className="lightbox-nav lightbox-nav--prev" aria-label="Previous photograph" onClick={() => step(-1)}>
+                  <button type="button" className="lightbox-nav lightbox-nav--prev" data-sound="swish" aria-label="Previous photograph" onClick={() => step(-1)}>
                     <ChevronLeft size={22} />
                   </button>
-                  <button type="button" className="lightbox-nav lightbox-nav--next" aria-label="Next photograph" onClick={() => step(1)}>
+                  <button type="button" className="lightbox-nav lightbox-nav--next" data-sound="swish" aria-label="Next photograph" onClick={() => step(1)}>
                     <ChevronRight size={22} />
                   </button>
                 </>

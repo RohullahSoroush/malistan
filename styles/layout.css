@@ -169,11 +169,10 @@
   .nav { display: none; }
   .menu-btn { display: grid; }
 }
-@media (max-width: 420px) {
-  .site-header__bar { gap: 4px; padding-right: 6px; }
-  .brand { gap: 9px; padding-right: 6px; }
-  .brand__mark { width: 40px; height: 40px; }
-}
+/* ── Sound toggle ──────────────────────────────────────────── */
+.sound-toggle.is-on { color: var(--brand); }
+
+
 
 /* ── Theme toggle ──────────────────────────────────────────── */
 .theme-toggle { padding: 5px; border-radius: 999px; }
@@ -386,4 +385,17 @@
   .footer-brand { display: block; }
   .footer-col:last-child { grid-column: 1 / -1; }
   .footer-col:last-child ul { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Small phones (kept last so it overrides the component rules above) */
+@media (max-width: 420px) {
+  .site-header__bar { gap: 2px; padding-right: 5px; }
+  .brand { gap: 8px; padding-right: 4px; }
+  .brand__mark { width: 38px; height: 38px; }
+  .brand__name { font-size: 19px; }
+  .icon-btn { width: 36px; height: 36px; }
+  .theme-toggle { padding: 3px; }
+  .theme-toggle__track { width: 54px; height: 30px; }
+  .theme-toggle__knob { width: 24px; height: 24px; }
+  [data-theme="dark"] .theme-toggle__knob { transform: translateX(24px); }
 }

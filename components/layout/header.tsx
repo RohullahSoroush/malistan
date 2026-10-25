@@ -8,6 +8,7 @@ import { ArrowRight, ArrowUpRight, BookOpen, Menu, Search, X } from "lucide-reac
 import { articles } from "@/lib/content";
 import { Brand } from "./brand";
 import { ThemeToggle } from "./theme-toggle";
+import { SoundToggle } from "@/components/sound/sound-toggle";
 
 export const navLinks = [
   { label: "History", href: "/history" },
@@ -126,10 +127,12 @@ export function Header() {
             aria-label={searchOpen ? "Close search" : "Search the archive"}
             aria-expanded={searchOpen}
             aria-controls="search-panel"
+            data-sound={searchOpen ? "close" : "open"}
             onClick={() => { setSearchOpen((v) => !v); setMenuOpen(false); }}
           >
             {searchOpen ? <X size={19} /> : <Search size={19} />}
           </button>
+          <SoundToggle />
           <ThemeToggle />
           <button
             ref={menuButton}
@@ -138,6 +141,7 @@ export function Header() {
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
+            data-sound={menuOpen ? "close" : "open"}
             onClick={() => { setMenuOpen((v) => !v); setSearchOpen(false); }}
           >
             {menuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -163,8 +167,8 @@ export function Header() {
             {!q && (
               <div className="search-suggest">
                 Try
-                {suggestions.map((s) => (
-                  <button key={s} type="button" onClick={() => setQuery(s)}>{s}</button>
+                {suggestions.map((s, i) => (
+                  <button key={s} type="button" data-sound="tick" data-sound-step={i} onClick={() => setQuery(s)}>{s}</button>
                 ))}
               </div>
             )}

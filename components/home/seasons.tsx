@@ -6,6 +6,7 @@ import { Check, Leaf, Snowflake, Sprout, Sun, type LucideIcon } from "lucide-rea
 import { SectionHeader } from "@/components/ui/section";
 import { Reveal } from "@/components/ui/reveal";
 import { malistanClock, type SeasonId } from "@/lib/live";
+import { playSound } from "@/lib/sound/store";
 
 const seasons: {
   id: SeasonId;
@@ -160,6 +161,7 @@ export function Seasons() {
     event.preventDefault();
     const next = (index + delta + seasons.length) % seasons.length;
     choose(seasons[next].id);
+    playSound(`season-${seasons[next].id}`);
     tabs.current[next]?.focus();
   };
 
@@ -191,6 +193,7 @@ export function Seasons() {
                     aria-controls="season-panel"
                     tabIndex={selected ? 0 : -1}
                     className="season-tab"
+                    data-sound={`season-${s.id}`}
                     onClick={() => choose(s.id)}
                     onKeyDown={(e) => onKeyDown(e, i)}
                   >
