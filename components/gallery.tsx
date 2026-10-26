@@ -38,7 +38,10 @@ export function Gallery() {
   useEffect(() => {
     const fromHash = () => {
       const id = decodeURIComponent(window.location.hash.slice(1));
-      if (id && photos.some((p) => p.id === id)) open(id);
+      if (!id || !photos.some((p) => p.id === id)) return;
+      // The photo may sit outside the current filter (or the Films tab), so show everything.
+      setCategory(ALL);
+      open(id);
     };
     fromHash();
     window.addEventListener("hashchange", fromHash);

@@ -399,3 +399,10 @@
   .theme-toggle__knob { width: 24px; height: 24px; }
   [data-theme="dark"] .theme-toggle__knob { transform: translateX(24px); }
 }
+@media (max-width: 350px) {
+  .site-header__actions { gap: 0; }
+  .brand { gap: 6px; }
+  .brand__mark { width: 34px; height: 34px; }
+  .brand__name { font-size: 17px; }
+  .icon-btn { width: 34px; height: 34px; }
+}

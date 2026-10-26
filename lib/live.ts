@@ -53,8 +53,11 @@ export type Weather = { temp: number; code: number; isDay: boolean; wind: number
 let weatherRequest: Promise<Weather | null> | null = null;
 
 function fetchWeather(): Promise<Weather | null> {
+  // Give up after a few seconds so a slow network never leaves the card loading forever.
+  const signal = typeof AbortSignal !== "undefined" && "timeout" in AbortSignal ? AbortSignal.timeout(8000) : undefined;
   weatherRequest ??= fetch(
     "https://api.open-meteo.com/v1/forecast?latitude=33.2953&longitude=67.1689&current=temperature_2m,weather_code,is_day,wind_speed_10m&timezone=Asia%2FKabul",
+    { signal },
   )
     .then((r) => (r.ok ? r.json() : null))
     .then((data) => {

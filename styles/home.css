@@ -602,8 +602,12 @@
   .season-tab__now { position: relative; top: auto; right: auto; align-self: center; }
 }
 @media (max-width: 560px) {
-  .seasons__tabs { grid-template-columns: repeat(2, 1fr); }
-  .season-tab { justify-content: flex-start; }
+  .seasons__tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .season-tab { justify-content: flex-start; min-width: 0; }
+}
+@media (max-width: 360px) {
+  .season-tab { gap: 6px; padding: 8px; }
+  .season-tab__icon { width: 30px; height: 30px; flex-shrink: 0; }
   .season-tab__now { margin-left: auto; }
 }
 

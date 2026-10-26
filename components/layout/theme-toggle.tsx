@@ -67,7 +67,7 @@ export function ThemeToggle() {
         { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
         { duration: 700, easing: "cubic-bezier(0.22, 1, 0.36, 1)", pseudoElement: "::view-transition-new(root)" },
       );
-    });
+    }).catch(() => undefined); // the browser may skip the transition; the theme still applies
     transition.finished.finally(() => root.classList.remove("theme-transition"));
   }
 

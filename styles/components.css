@@ -306,8 +306,8 @@ a.signature:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
 .founder__quote::before { content: "\201C"; color: var(--accent); }
 .founder__quote::after { content: "\201D"; color: var(--accent); }
 .founder__body > p { color: var(--text-muted); font-size: 16px; }
-.prose .founder { grid-template-columns: 1fr; }
-.prose .founder__aside { grid-template-columns: 112px 1fr; align-items: center; }
+.prose .founder { grid-template-columns: minmax(0, 1fr); }
+.prose .founder__aside { grid-template-columns: 112px minmax(0, 1fr); align-items: center; }
 .prose .founder__badge { display: none; }
 .prose .founder__links { grid-column: 1 / -1; }
 @media (max-width: 860px) {
@@ -316,6 +316,12 @@ a.signature:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
   .founder__portrait { border-radius: 22px; }
   .founder__badge { display: none; }
   .founder__links { grid-column: 1 / -1; }
+}
+@media (max-width: 480px) {
+  .founder { grid-template-columns: minmax(0, 1fr); }
+  .founder__aside,
+  .prose .founder__aside { grid-template-columns: 84px minmax(0, 1fr); gap: 14px; }
+  .founder__name strong { font-size: 24px; }
 }
 
 /* ── Note card ─────────────────────────────────────────────── */
