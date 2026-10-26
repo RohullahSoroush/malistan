@@ -74,12 +74,13 @@
 .toc__progress span { display: block; height: 100%; background: linear-gradient(90deg, var(--brand), var(--accent)); transform-origin: left; transition: transform 0.5s var(--ease); }
 .toc .link { margin: 14px 8px 2px; font-size: 13.5px; }
 
-.prose { display: grid; gap: clamp(44px, 5vw, 60px); max-width: 72ch; }
+.prose { display: grid; gap: clamp(40px, 5vw, 56px); max-width: 72ch; }
+.chapter-group { display: grid; gap: clamp(34px, 4vw, 48px); }
 .chapter { scroll-margin-top: 110px; }
 .chapter__num { display: block; margin-bottom: 10px; font-size: 12px; font-weight: 800; letter-spacing: 0.14em; color: var(--brand); }
 .chapter h2 { font-size: clamp(28px, 3.2vw, 40px); }
 .chapter p { margin-top: 16px; font-size: clamp(16.5px, 1.4vw, 18px); line-height: 1.85; color: var(--text-muted); }
-.chapter:first-child p::first-letter {
+.chapter-group:first-child .chapter p::first-letter {
   float: left;
   margin: 0.06em 0.12em 0 0;
   font-family: var(--font-display);
@@ -233,8 +234,10 @@
   .lightbox-caption h2 { font-size: 22px; }
 }
 @media (max-width: 520px) {
-  .segmented { display: grid; grid-template-columns: 1fr 1fr; width: 100%; border-radius: 20px; }
-  .segmented button { border-radius: 15px; }
+  .segmented { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; border-radius: 20px; }
+  .segmented button { min-width: 0; padding: 9px 10px; border-radius: 15px; font-size: 13px; white-space: normal; }
+  .segmented__label { justify-content: center; text-align: center; }
+  .segmented__count { min-width: 18px; padding: 0 5px; font-size: 10.5px; }
 }
 
 /* ── Sources ───────────────────────────────────────────────── */

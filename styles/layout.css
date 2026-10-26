@@ -169,6 +169,24 @@
   .nav { display: none; }
   .menu-btn { display: grid; }
 }
+/* ── Back to top ───────────────────────────────────────────── */
+.back-to-top {
+  position: fixed; right: clamp(16px, 3vw, 28px); bottom: clamp(16px, 3vw, 28px); z-index: 50;
+  width: 46px; height: 46px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  transform: translateY(12px) scale(0.9);
+  pointer-events: none;
+  transition: opacity 0.35s var(--ease), transform 0.45s var(--ease-spring), background-color 0.2s var(--ease), color 0.2s var(--ease);
+}
+.back-to-top.is-shown { opacity: 1; transform: none; pointer-events: auto; }
+.back-to-top:hover { background: var(--brand); color: var(--brand-contrast); border-color: var(--brand); }
+
 /* ── Sound toggle ──────────────────────────────────────────── */
 .sound-toggle.is-on { color: var(--brand); }
 

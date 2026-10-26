@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { extras } from "./article-extras";
 import { articles, sources } from "./content";
 import { photos, type Photo } from "./photos";
 import { siteUrl } from "./site-url";
@@ -264,7 +265,18 @@ export function articleGraph(slug: string) {
         : {}),
     },
   ];
-  if (slug === "about") graph[0].mainEntity = { "@id": ids.organization };
+  if (slug === "about") {
+    graph[0].mainEntity = { "@id": ids.organization };
+    const faq = extras.about?.faq;
+    if (faq?.length) {
+      graph[0]["@type"] = ["AboutPage", "FAQPage"];
+      graph[0].mainEntity = faq.map((f) => ({
+        "@type": "Question",
+        name: f.q,
+        acceptedAnswer: { "@type": "Answer", text: f.a },
+      }));
+    }
+  }
   return graph;
 }
 

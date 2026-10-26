@@ -85,7 +85,7 @@
   --radius-xl: 32px;
   --container: 1200px;
   --gutter: clamp(16px, 4vw, 32px);
-  --section: clamp(72px, 10vw, 128px);
+  --section: clamp(64px, 8vw, 112px);
   --header-h: 64px;
 
   /* Motion */

@@ -3,6 +3,7 @@ import { siteUrl } from "@/lib/site-url";
 import { founder, graph, pages, siteGraph, SITE_NAME } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/json-ld";
 import { Ambient } from "@/components/layout/ambient";
+import { BackToTop } from "@/components/layout/back-to-top";
 import { Experience } from "@/components/layout/experience";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
@@ -14,6 +15,7 @@ import "@/styles/layout.css";
 import "@/styles/components.css";
 import "@/styles/home.css";
 import "@/styles/pages.css";
+import "@/styles/article.css";
 
 // Runs before first paint so the saved theme never flashes.
 const themeScript = `(function(){var d=document.documentElement;d.classList.add('js');var p=null;try{p=localStorage.getItem('malistan-theme')}catch(e){}var dark=p==='dark'||(p!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches);d.dataset.theme=dark?'dark':'light'})()`;
@@ -87,6 +89,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Header />
         {children}
         <Footer />
+        <BackToTop />
       </body>
     </html>
   );

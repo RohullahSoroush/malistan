@@ -70,6 +70,7 @@ export function Highlights() {
                 {crops.map((c) => <span className="chip" key={c}>{c}</span>)}
               </div>
               <p>Highland sheep and goats graze the summer pastures above the fields.</p>
+              <Link className="link" href="#seasons">Through the seasons <ArrowRight aria-hidden="true" /></Link>
             </div>
           </Reveal>
 

@@ -55,7 +55,9 @@ p { margin: 0; text-wrap: pretty; }
 .container { width: min(100% - var(--gutter) * 2, var(--container)); margin-inline: auto; }
 .section { padding-block: var(--section); }
 .section--tight { padding-block: calc(var(--section) * 0.6); }
-.page { padding-top: calc(var(--header-h) + clamp(56px, 9vw, 104px)); padding-bottom: var(--section); }
+/* Neighbouring sections share one gap instead of stacking two */
+:is(.section, .section--tight) + :is(.section, .section--tight) { padding-top: calc(var(--section) * 0.2); }
+.page { padding-top: calc(var(--header-h) + clamp(48px, 7vw, 84px)); padding-bottom: calc(var(--section) * 0.6); }
 
 .skip-link {
   position: fixed; left: 16px; top: -64px; z-index: 100;

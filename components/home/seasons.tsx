@@ -166,7 +166,7 @@ export function Seasons() {
   };
 
   return (
-    <section className="section" aria-labelledby="seasons-title">
+    <section id="seasons" className="section" aria-labelledby="seasons-title">
       <div className="container">
         <Reveal>
           <SectionHeader

@@ -1,11 +1,13 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, MapPin } from "lucide-react";
+import { villages } from "@/lib/article-extras";
 import { Eyebrow } from "@/components/ui/section";
 import { Reveal } from "@/components/ui/reveal";
 
 export function Intro() {
   return (
-    <section className="section" aria-labelledby="intro-title">
+    <section className="section intro" aria-labelledby="intro-title">
+      <span className="intro__watermark" lang="fa" dir="rtl" aria-hidden="true">مالستان</span>
       <div className="container intro__grid">
         <Reveal className="intro__heading">
           <Eyebrow>Welcome home</Eyebrow>
@@ -29,6 +31,23 @@ export function Intro() {
           </Link>
         </Reveal>
       </div>
+
+      <Reveal className="container" delay={0.15}>
+        <div className="villages">
+          <span className="villages__label"><MapPin size={14} aria-hidden="true" /> Explore the villages</span>
+          <ul className="villages__list">
+            {villages.map((v) => (
+              <li key={v.name}>
+                <Link href={`/places#${v.anchor}`} className="village">
+                  <span className="village__name">{v.name}</span>
+                  <span className="village__native" lang="fa" dir="rtl">{v.native}</span>
+                  <span className="village__note">{v.note}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </Reveal>
     </section>
   );
 }

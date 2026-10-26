@@ -8,20 +8,28 @@ export function Toc({ items }: { items: { id: string; label: string }[] }) {
   const [active, setActive] = useState(items[0]?.id);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const first = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
-        if (first) setActive(first.target.id);
-      },
-      { rootMargin: "-20% 0px -65% 0px" },
-    );
-    items.forEach(({ id }) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
-    return () => observer.disconnect();
+    const chapters = items.map(({ id }) => document.getElementById(id)).filter((el): el is HTMLElement => Boolean(el));
+    let frame = 0;
+    // The active chapter is the last one whose heading has passed the reading line.
+    const update = () => {
+      frame = 0;
+      const line = window.innerHeight * 0.35;
+      let current = chapters[0]?.id;
+      for (const el of chapters) {
+        if (el.getBoundingClientRect().top <= line) current = el.id;
+        else break;
+      }
+      if (current) setActive(current);
+    };
+    const onScroll = () => { if (!frame) frame = requestAnimationFrame(update); };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      cancelAnimationFrame(frame);
+    };
   }, [items]);
 
   const index = Math.max(0, items.findIndex((i) => i.id === active));
