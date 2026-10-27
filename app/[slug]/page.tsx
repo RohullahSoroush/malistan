@@ -12,6 +12,7 @@ import { articles, sources } from "@/lib/content";
 import { photos } from "@/lib/photos";
 import { articleGraph, graph, pageMetadata, pages } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/json-ld";
+import { CONTACT_EMAIL } from "@/lib/site-url";
 
 export function generateStaticParams() {
   return Object.keys(articles).map((slug) => ({ slug }));
@@ -21,6 +22,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   if (!articles[slug] || !pages[slug]) return { title: "Page not found" };
   return pageMetadata(slug, `/${slug}`, { type: "article" });
+}
+
+// Turns the contact address inside article text into a mailto link.
+function linkEmail(text: string) {
+  const parts = text.split(CONTACT_EMAIL);
+  if (parts.length === 1) return text;
+  return parts.flatMap((part, i) => (i === 0 ? [part] : [<a key={i} href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>, part]));
 }
 
 function slugify(value: string) {
@@ -75,7 +83,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                 <section className="chapter" id={toc[i].id} key={s.title}>
                   <span className="chapter__num">CHAPTER {String(i + 1).padStart(2, "0")}</span>
                   <h2>{s.title}</h2>
-                  <p>{s.text}</p>
+                  <p>{linkEmail(s.text)}</p>
                   {source && (
                     <a className="source-pill" href={source.url} target="_blank" rel="noopener noreferrer">
                       <BookMarked size={15} aria-hidden="true" /> {source.name} · {source.date}

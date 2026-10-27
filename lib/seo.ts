@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { articles, sources } from "./content";
 import { photos, type Photo } from "./photos";
-import { siteUrl } from "./site-url";
+import { CONTACT_EMAIL, siteUrl } from "./site-url";
 
 export const SITE_NAME = "Malistan Archive";
 export const PUBLISHED = "2026-10-23";
-export const UPDATED = "2026-10-25";
+export const UPDATED = "2026-10-27";
 
 export const abs = (path: string) => (path.startsWith("http") ? path : `${siteUrl}${path.startsWith("/") ? "" : "/"}${path}`);
 
@@ -158,6 +158,8 @@ export function siteGraph() {
       logo: { "@type": "ImageObject", url: abs("/logo-512.png"), width: 512, height: 512 },
       image: abs(pages.home.image),
       description: "An independent community archive documenting the history, places, culture and people of Malistan district in Ghazni, Afghanistan.",
+      email: CONTACT_EMAIL,
+      contactPoint: { "@type": "ContactPoint", contactType: "general enquiries", email: CONTACT_EMAIL, availableLanguage: ["English", "Persian"] },
       founder: { "@id": ids.founder },
     },
     {

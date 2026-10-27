@@ -3,6 +3,7 @@ import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import { LiveClock } from "@/components/live/live-card";
 import { founder } from "@/lib/seo";
+import { CONTACT_EMAIL } from "@/lib/site-url";
 import { Brand } from "./brand";
 
 const columns = [
@@ -23,6 +24,7 @@ const columns = [
       { label: "Meet the founder", href: "/about#founder" },
       { label: "Contribute a memory", href: "/about#contribute-to-a-future-edition" },
       { label: "Sources & credits", href: "/sources" },
+      { label: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}` },
     ],
   },
   {
@@ -70,6 +72,8 @@ export function Footer() {
                       <a href={l.href} target="_blank" rel="noopener noreferrer">
                         {l.label} <ArrowUpRight size={13} aria-hidden="true" />
                       </a>
+                    ) : l.href.startsWith("mailto:") ? (
+                      <a href={l.href}>{l.label}</a>
                     ) : (
                       <Link href={l.href}>{l.label}</Link>
                     )}

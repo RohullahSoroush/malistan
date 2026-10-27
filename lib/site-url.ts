@@ -2,6 +2,9 @@
 // Open Graph URLs, structured data, the sitemap and robots.txt.
 export const PRODUCTION_URL = "https://malistan.org";
 
+// The public contact address, shown in the footer, the About page and structured data.
+export const CONTACT_EMAIL = "hello@malistan.org";
+
 function resolveSiteUrl() {
   // Vercel production deploys always use the real domain, so a stale
   // dashboard variable can never point search engines elsewhere.
