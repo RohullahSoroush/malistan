@@ -2,50 +2,27 @@
 
 import { useId, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { AlertCircle, ArrowRight, Lock, Mail, RotateCcw } from "lucide-react";
+import { AlertCircle, ArrowRight, Lock, RotateCcw } from "lucide-react";
+import {
+  CONTACT_LIMITS as LIMITS,
+  CONTACT_TOPICS as topics,
+  topicLabel as labelFor,
+  validateContactField as validate,
+  type ContactField as Field,
+  type ContactTopic as TopicId,
+  type ContactValues as Values,
+} from "@/lib/contact";
 import { CONTACT_EMAIL } from "@/lib/site-url";
 import { playSound } from "@/lib/sound/store";
 
 /**
- * Messages are delivered by Web3Forms (https://web3forms.com), which works on a static site.
- * The access key is tied to the inbox it was created for (hello@malistan.org) and is safe to
- * ship in the browser. Without a key, the form opens the visitor's email app instead.
+ * Messages go to /api/contact, which emails them to the archive inbox through Resend.
+ * If the server has no Resend key yet, the form opens the visitor's email app instead.
  */
-const ACCESS_KEY = process.env.NEXT_PUBLIC_WEB3FORMS_KEY?.trim() ?? "";
-const ENDPOINT = "https://api.web3forms.com/submit";
+const ENDPOINT = "/api/contact";
 
-const topics = [
-  { id: "general", label: "A question" },
-  { id: "memory", label: "Share a memory" },
-  { id: "correction", label: "A correction" },
-  { id: "collaborate", label: "Collaborate" },
-] as const;
-
-type TopicId = (typeof topics)[number]["id"];
-type Field = "name" | "email" | "message";
-type Values = Record<Field, string>;
 type Status = "idle" | "sending" | "sent" | "mailto" | "error";
-
-const LIMITS = { name: 80, message: 2000 };
-const MIN_MESSAGE = 10;
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-
-function validate(field: Field, value: string): string {
-  const v = value.trim();
-  if (field === "name") {
-    if (!v) return "Please tell us your name.";
-    if (v.length > LIMITS.name) return `Please keep your name under ${LIMITS.name} characters.`;
-  }
-  if (field === "email") {
-    if (!v) return "Please add your email so we can reply.";
-    if (!EMAIL_PATTERN.test(v)) return "That email address doesn’t look quite right.";
-  }
-  if (field === "message") {
-    if (v.length < MIN_MESSAGE) return "Please write a little more — at least a sentence.";
-    if (v.length > LIMITS.message) return `Please keep your message under ${LIMITS.message} characters.`;
-  }
-  return "";
-}
+type Problem = "send_failed" | "rate_limited";
 
 function mailtoLink(values: Values, topic: string) {
   const subject = `[Malistan] ${topic} from ${values.name.trim() || "a visitor"}`;
@@ -63,8 +40,10 @@ export function ContactForm() {
   const [touched, setTouched] = useState<Partial<Record<Field, boolean>>>({});
   const [status, setStatus] = useState<Status>("idle");
   const [sentName, setSentName] = useState("");
+  const [problem, setProblem] = useState<Problem>("send_failed");
+  const startedAt = useRef(Date.now());
 
-  const topicLabel = topics.find((t) => t.id === topic)!.label;
+  const topicLabel = labelFor(topic);
   const id = (f: string) => `${uid}-${f}`;
 
   const update = (field: Field, value: string) => {
@@ -102,41 +81,59 @@ export function ContactForm() {
       return;
     }
 
-    const firstName = values.name.trim().split(/\s+/)[0];
-
-    if (!ACCESS_KEY) {
-      window.location.href = mailtoLink(values, topicLabel);
+    const firstName = values.name.trim().split(/s+/)[0];
+    const openMailApp = () => {
+      const href = mailtoLink(values, topicLabel);
       setSentName(firstName);
       setStatus("mailto");
-      return;
-    }
+      // Update the screen first, then hand over to the email app with a link click,
+      // which leaves this page running (assigning location.href can stall it).
+      window.setTimeout(() => {
+        const link = document.createElement("a");
+        link.href = href;
+        link.rel = "noopener";
+        link.click();
+      }, 60);
+    };
 
     setStatus("sending");
     try {
-      const signal = typeof AbortSignal !== "undefined" && "timeout" in AbortSignal ? AbortSignal.timeout(15000) : undefined;
+      const signal = typeof AbortSignal !== "undefined" && "timeout" in AbortSignal ? AbortSignal.timeout(20000) : undefined;
       const response = await fetch(ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({
-          access_key: ACCESS_KEY,
-          subject: `[Malistan] ${topicLabel} from ${values.name.trim()}`,
-          from_name: "Malistan Archive website",
-          name: values.name.trim(),
-          email: values.email.trim(),
-          topic: topicLabel,
-          message: values.message.trim(),
-          page: typeof window !== "undefined" ? window.location.href : "",
+          ...values,
+          topic,
+          page: window.location.href,
+          startedAt: startedAt.current,
+          botcheck: "",
         }),
         signal,
       });
-      const result = (await response.json().catch(() => null)) as { success?: boolean } | null;
-      if (!response.ok || !result?.success) throw new Error("Delivery failed");
-      setSentName(firstName);
-      setStatus("sent");
-      setValues({ name: "", email: "", message: "" });
-      setTouched({});
-      playSound("pop");
+      const result = (await response.json().catch(() => null)) as
+        | { success?: boolean; error?: string; fields?: Partial<Record<Field, string>> }
+        | null;
+
+      if (response.ok && result?.success) {
+        setSentName(firstName);
+        setStatus("sent");
+        setValues({ name: "", email: "", message: "" });
+        setTouched({});
+        startedAt.current = Date.now();
+        playSound("pop");
+        return;
+      }
+      if (result?.error === "not_configured") return openMailApp();
+      if (result?.error === "invalid" && result.fields) {
+        setErrors(result.fields);
+        setStatus("idle");
+        return;
+      }
+      setProblem(result?.error === "rate_limited" ? "rate_limited" : "send_failed");
+      setStatus("error");
     } catch {
+      setProblem("send_failed");
       setStatus("error");
     }
   }
@@ -279,7 +276,9 @@ export function ContactForm() {
                 <motion.div className="form-alert" role="alert" {...fade}>
                   <AlertCircle aria-hidden="true" />
                   <p>
-                    Your message couldn’t be sent just now. Please try again, or{" "}
+                    {problem === "rate_limited"
+                      ? "You’ve sent several messages in a short time. Please wait a few minutes, or "
+                      : "Your message couldn’t be sent just now. Please try again, or "}
                     <a href={mailtoLink(values, topicLabel)}>send it by email instead</a>.
                   </p>
                 </motion.div>
@@ -292,13 +291,9 @@ export function ContactForm() {
                   <>
                     <span className="spinner" aria-hidden="true" /> Sending…
                   </>
-                ) : ACCESS_KEY ? (
-                  <>
-                    Send message <ArrowRight aria-hidden="true" />
-                  </>
                 ) : (
                   <>
-                    <Mail aria-hidden="true" /> Continue in your email app
+                    Send message <ArrowRight aria-hidden="true" />
                   </>
                 )}
               </button>

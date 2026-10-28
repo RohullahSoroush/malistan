@@ -14,6 +14,9 @@ import { articleGraph, graph, pageMetadata, pages } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/json-ld";
 import { CONTACT_EMAIL } from "@/lib/site-url";
 
+// Only the stories in lib/content.ts exist; any other address is a 404.
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return Object.keys(articles).map((slug) => ({ slug }));
 }

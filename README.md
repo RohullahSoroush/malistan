@@ -16,7 +16,7 @@ npm run check
 npm run build
 ```
 
-`next build` statically exports the website to `out/`. There is no backend, database, account system or upload endpoint.
+Every page is pre-rendered at build time. The only server code is `app/api/contact/route.ts`, which emails contact-form messages through Resend. There is no database, account system or upload endpoint.
 
 ## Pages and interactions
 
@@ -36,10 +36,10 @@ Edit `lib/content.ts` for articles, source records and photo metadata. Edit `app
 
 The two opening photographs are real Malistan images from Wikimedia Commons, credited to Danial and Mohammad Reza Rahmani under CC BY-SA 4.0. WebP copies have been resized; layouts may crop them. Keep the attribution and original-source links on `/sources`. Do not assume other internet images can be republished.
 
-The research uses UNHCR’s 2003 district profile, a 2022 Maknak livelihoods study, local cultural reporting and a geographic overview. Source dates and disputed musical attributions are visible. The archive does not assert a current population count or provide current travel guidance. The film collection is honestly marked as forthcoming. Contribution instructions currently direct people to the founder; no online submissions are collected.
+The research uses UNHCR’s 2003 district profile, a 2022 Maknak livelihoods study, local cultural reporting and a geographic overview. Source dates and disputed musical attributions are visible. The archive does not assert a current population count or provide current travel guidance. The film collection is honestly marked as forthcoming. Contribution instructions direct people to the founder; the contact form sends short messages but does not accept file uploads.
 
 ## Deploy on Vercel
 
 Import the GitHub repository into Vercel and select Next.js. The default build command is `npm run build`. Add `NEXT_PUBLIC_SITE_URL` with the final public origin (for example `https://your-project.vercel.app`) and rebuild so canonical links, Open Graph image URLs, sitemap and robots.txt use the production domain. Never put private tokens in this variable or commit `.env` files.
 
-`npm run build` also works with ordinary static hosting using the generated `out/` directory. For search indexing after publication, register the final domain in Google Search Console and submit `/sitemap.xml`; indexing and rankings are not guaranteed by implementation alone.
+Contact form: set `RESEND_API_KEY` in Vercel (see `.env.example`) after verifying malistan.org in Resend. Because of this form the site needs a host that runs Next.js, such as Vercel; keep the Vercel Output Directory setting on its default. For search indexing after publication, register the final domain in Google Search Console and submit `/sitemap.xml`; indexing and rankings are not guaranteed by implementation alone.
