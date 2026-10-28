@@ -14,6 +14,7 @@ The archive links its sources on every page, labels historical figures with thei
 - [About the archive](https://malistan.org/about): Purpose, editorial promise, the founder, and how to contribute.
 - [Photo archive](https://malistan.org/gallery): Photographs of Malistan's valleys, fields, streams and seasons with credits.
 - [Sources & credits](https://malistan.org/sources): Every source used, with dates and notes, plus photo and map credits.
+- [Contact](https://malistan.org/contact): A short form to send questions, memories, corrections or collaboration ideas to hello@malistan.org.
 
 ## Key facts
 

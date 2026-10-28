@@ -24,6 +24,7 @@ const columns = [
       { label: "Meet the founder", href: "/about#founder" },
       { label: "Contribute a memory", href: "/about#contribute-to-a-future-edition" },
       { label: "Sources & credits", href: "/sources" },
+      { label: "Contact us", href: "/contact" },
       { label: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}` },
     ],
   },

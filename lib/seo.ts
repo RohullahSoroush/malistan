@@ -86,6 +86,13 @@ export const pages: Record<string, PageSeo> = {
     image: "/images/og-sources.jpg",
     imageAlt: "A footpath past a freshly cut hay field in Malistan",
   },
+  contact: {
+    title: "Contact the Malistan Archive",
+    description:
+      "Write to the Malistan Archive — questions, family memories, photographs, corrections and collaborations. Every message is read personally.",
+    image: "/images/og-about.jpg",
+    imageAlt: "Summer clouds over the mountains and poplar groves of Malistan",
+  },
 };
 
 /** Complete metadata for a page: title, description, canonical, Open Graph and Twitter. */
@@ -311,6 +318,16 @@ export function sourcesGraph() {
         item: { "@type": "CreativeWork", name: s.name, url: s.url, description: s.note },
       })),
     },
+  ];
+}
+
+export function contactGraph() {
+  return [
+    webPage("ContactPage", "contact", "/contact", {
+      breadcrumb: { "@id": abs("/contact#breadcrumb") },
+      mainEntity: { "@id": ids.organization },
+    }),
+    breadcrumbs([[pages.contact.title, "/contact"]]),
   ];
 }
 

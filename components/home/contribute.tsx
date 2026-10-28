@@ -1,4 +1,4 @@
-import { ArrowUpRight, BookMarked } from "lucide-react";
+import { ArrowUpRight, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/section";
 import { Reveal } from "@/components/ui/reveal";
@@ -24,8 +24,8 @@ export function Contribute() {
               <Button href="/about#contribute-to-a-future-edition" variant="light" size="lg">
                 How to contribute <ArrowUpRight aria-hidden="true" />
               </Button>
-              <Button href="/sources" variant="glass" size="lg">
-                <BookMarked aria-hidden="true" /> Our sources
+              <Button href="/contact" variant="glass" size="lg">
+                <Mail aria-hidden="true" /> Get in touch
               </Button>
             </div>
           </div>

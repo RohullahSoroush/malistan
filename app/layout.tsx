@@ -14,6 +14,7 @@ import "@/styles/layout.css";
 import "@/styles/components.css";
 import "@/styles/home.css";
 import "@/styles/pages.css";
+import "@/styles/contact.css";
 
 // Runs before first paint so the saved theme never flashes.
 const themeScript = `(function(){var d=document.documentElement;d.classList.add('js');var p=null;try{p=localStorage.getItem('malistan-theme')}catch(e){}var dark=p==='dark'||(p!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches);d.dataset.theme=dark?'dark':'light'})()`;

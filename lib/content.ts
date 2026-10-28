@@ -226,7 +226,7 @@ export const articles: Record<string, Article> = {
       },
       {
         title: "Contribute to a future edition",
-        text: "If you have a photograph, a family memory, a voice recording, or knowledge of a person from Malistan whose story belongs here: prepare the original file, its approximate date and location, the creator's name, a short description, and your permission to publish. The archive does not collect contributions through this website in its current edition—please email them to hello@malistan.org.",
+        text: "If you have a photograph, a family memory, a voice recording, or knowledge of a person from Malistan whose story belongs here: prepare the original file, its approximate date and location, the creator's name, a short description, and your permission to publish. Files can't be uploaded through this website yet—please email them to hello@malistan.org, or start with a short note through the Contact page.",
       },
     ],
   },

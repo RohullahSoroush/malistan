@@ -17,6 +17,7 @@ export const navLinks = [
   { label: "People", href: "/people" },
   { label: "Gallery", href: "/gallery" },
   { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
 ];
 
 const suggestions = ["Maknak", "Music", "Nowruz", "Hazarajat"];

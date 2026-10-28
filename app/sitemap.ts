@@ -33,5 +33,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       images: photos.map((p) => abs(p.src)),
     },
     { url: abs("/sources"), lastModified: UPDATED, changeFrequency: "monthly", priority: 0.5 },
+    { url: abs("/contact"), lastModified: UPDATED, changeFrequency: "yearly", priority: 0.4 },
   ];
 }
