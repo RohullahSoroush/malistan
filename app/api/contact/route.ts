@@ -36,17 +36,40 @@ function json(body: Record<string, unknown>, status = 200) {
 const escapeHtml = (s: string) =>
   s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
-// Stops a visitor's text from adding extra lines to email headers.
-const oneLine = (s: string) => s.replace(/[\r\n]+/g, " ").trim();
+// Keeps a visitor's text on one line: removes control characters and every kind of line break.
+const oneLine = (s: string) =>
+  Array.from(s, (ch) => {
+    const code = ch.codePointAt(0) ?? 0;
+    const isBreak = code < 32 || (code >= 127 && code <= 159) || code === 8232 || code === 8233;
+    return isBreak ? " " : ch;
+  })
+    .join("")
+    .replace(/ {2,}/g, " ")
+    .trim();
+
+/** The site's own host. Vercel sets Host to the real domain; x-forwarded-host is only a fallback. */
+function siteHost(request: Request) {
+  return request.headers.get("host") ?? request.headers.get("x-forwarded-host") ?? "";
+}
 
 function sameOrigin(request: Request) {
   const origin = request.headers.get("origin");
   if (!origin) return false;
-  const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host");
   try {
-    return new URL(origin).host === host;
+    const url = new URL(origin);
+    return (url.protocol === "https:" || url.protocol === "http:") && url.host === siteHost(request);
   } catch {
     return false;
+  }
+}
+
+/** Keeps the "sent from" page only when it is a page of this site. */
+function sitePage(value: string, request: Request) {
+  try {
+    const url = new URL(value);
+    return url.host === siteHost(request) ? `${url.origin}${url.pathname}`.slice(0, 300) : "";
+  } catch {
+    return "";
   }
 }
 
@@ -86,7 +109,7 @@ export async function POST(request: Request) {
   const email = oneLine(values.email);
   const message = values.message.trim();
   const topic = topicLabel(topicId);
-  const page = oneLine(text("page")).slice(0, 300);
+  const page = sitePage(text("page"), request);
   const sentAt = new Date().toUTCString();
 
   const html = `<!doctype html>
@@ -129,12 +152,14 @@ export async function POST(request: Request) {
     });
 
     if (!response.ok) {
-      console.error("Resend rejected the contact message", response.status, await response.text().catch(() => ""));
+      // Log only Resend's error type, never the message or the visitor's details.
+      const detail = (await response.json().catch(() => null)) as { name?: string } | null;
+      console.error("Resend rejected the contact message", response.status, detail?.name ?? "unknown_error");
       return json({ success: false, error: "send_failed" }, 502);
     }
     return json({ success: true });
   } catch (error) {
-    console.error("Could not reach Resend", error);
+    console.error("Could not reach Resend", error instanceof Error ? error.name : "unknown_error");
     return json({ success: false, error: "send_failed" }, 502);
   }
 }
