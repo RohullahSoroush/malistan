@@ -1,5 +1,6 @@
 import { CONTACT_TOPICS, topicLabel, validateContact } from "@/lib/contact";
 import { CONTACT_EMAIL } from "@/lib/site-url";
+import { fileContactMessage } from "@/lib/archive";
 
 /*
  * Sends contact-form messages to the archive's inbox through Resend (https://resend.com).
@@ -102,14 +103,18 @@ export async function POST(request: Request) {
   const ip = (request.headers.get("x-forwarded-for") ?? request.headers.get("x-real-ip") ?? "unknown").split(",")[0].trim();
   if (rateLimited(ip)) return json({ success: false, error: "rate_limited" }, 429);
 
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) return json({ success: false, error: "not_configured" }, 503);
-
   const name = oneLine(values.name);
   const email = oneLine(values.email);
   const message = values.message.trim();
   const topic = topicLabel(topicId);
   const page = sitePage(text("page"), request);
+
+  // Every message is filed in the admin's Messages inbox (admin.malistan.org) and emailed to the archive's address;
+  // the visitor sees success when at least one of the two worked.
+  const filed = await fileContactMessage({ name, email, topic: topicId, message, page });
+
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return filed ? json({ success: true }) : json({ success: false, error: "not_configured" }, 503);
   const sentAt = new Date().toUTCString();
 
   const html = `<!doctype html>
@@ -155,11 +160,11 @@ export async function POST(request: Request) {
       // Log only Resend's error type, never the message or the visitor's details.
       const detail = (await response.json().catch(() => null)) as { name?: string } | null;
       console.error("Resend rejected the contact message", response.status, detail?.name ?? "unknown_error");
-      return json({ success: false, error: "send_failed" }, 502);
+      return filed ? json({ success: true }) : json({ success: false, error: "send_failed" }, 502);
     }
     return json({ success: true });
   } catch (error) {
     console.error("Could not reach Resend", error instanceof Error ? error.name : "unknown_error");
-    return json({ success: false, error: "send_failed" }, 502);
+    return filed ? json({ success: true }) : json({ success: false, error: "send_failed" }, 502);
   }
 }

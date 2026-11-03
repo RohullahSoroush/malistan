@@ -3,19 +3,31 @@
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowUpRight, ChevronLeft, ChevronRight, Clapperboard, Expand, X } from "lucide-react";
-import { photoCategories, photos, type Photo } from "@/lib/photos";
+import { ArrowUpRight, ChevronLeft, ChevronRight, Clapperboard, Expand, Play, X } from "lucide-react";
+import { photoCategories, type Photo } from "@/lib/photos";
+import type { Film } from "@/lib/archive";
 import { Button } from "@/components/ui/button";
 import { playSound } from "@/lib/sound/store";
 
 const ALL = "All";
 const FILMS = "Films";
-const filters = [ALL, ...photoCategories, FILMS];
+/** The film's player address: privacy-friendly YouTube or Vimeo embeds; other links open on their own site. */
+function embedUrl(f: Film) {
+  if (f.provider === "youtube" && f.embedId) return `https://www.youtube-nocookie.com/embed/${f.embedId}?rel=0&autoplay=1`;
+  if (f.provider === "vimeo" && f.embedId) return `https://player.vimeo.com/video/${f.embedId}?dnt=1&autoplay=1`;
+  return null;
+}
+const thumbnail = (f: Film) => f.thumbnail || (f.provider === "youtube" && f.embedId ? `https://i.ytimg.com/vi/${f.embedId}/hqdefault.jpg` : null);
 
-export function Gallery() {
+export function Gallery({ photos, films }: { photos: Photo[]; films: Film[] }) {
   const [category, setCategory] = useState<string>(ALL);
   const [openId, setOpenId] = useState<string | null>(null);
+  const [playing, setPlaying] = useState<Film | null>(null);
   const dialog = useRef<HTMLDialogElement>(null);
+  const filmDialog = useRef<HTMLDialogElement>(null);
+  // The built-in categories first, then any new ones the editors added.
+  const filters = [ALL, ...photoCategories.filter((c) => photos.some((p) => p.category === c)),
+    ...[...new Set(photos.map((p) => p.category))].filter((c) => !photoCategories.includes(c)), FILMS];
 
   const visible = category === ALL ? photos : photos.filter((p) => p.category === category);
   const index = openId ? visible.findIndex((p) => p.id === openId) : -1;
@@ -46,7 +58,7 @@ export function Gallery() {
     fromHash();
     window.addEventListener("hashchange", fromHash);
     return () => window.removeEventListener("hashchange", fromHash);
-  }, [open]);
+  }, [open, photos]);
 
   useEffect(() => {
     if (!openId) return;
@@ -58,7 +70,13 @@ export function Gallery() {
     return () => window.removeEventListener("keydown", onKey);
   }, [openId, step]);
 
-  const count = (f: string) => (f === ALL ? photos.length : photos.filter((p) => p.category === f).length);
+  const count = (f: string) => (f === ALL ? photos.length : f === FILMS ? films.length : photos.filter((p) => p.category === f).length);
+
+  const play = (f: Film) => {
+    if (!embedUrl(f)) { window.open(f.url, "_blank", "noopener,noreferrer"); return; }
+    setPlaying(f);
+    if (!filmDialog.current?.open) filmDialog.current?.showModal();
+  };
 
   return (
     <>
@@ -70,13 +88,33 @@ export function Gallery() {
             )}
             <span className="segmented__label">
               {f}
-              {f !== FILMS && <span className="segmented__count">{count(f)}</span>}
+              {(f !== FILMS || films.length > 0) && <span className="segmented__count">{count(f)}</span>}
             </span>
           </button>
         ))}
       </div>
 
-      {category === FILMS ? (
+      {category === FILMS && films.length > 0 ? (
+        <div className="film-grid">
+          {films.map((f) => {
+            const thumb = thumbnail(f);
+            return (
+              <button key={f.id} type="button" className="film-card" data-tilt data-spotlight onClick={() => play(f)}>
+                <span className="film-card__media">
+                  {thumb ? <Image src={thumb} alt="" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" /> : <Clapperboard size={36} aria-hidden="true" />}
+                  <span className="film-card__play" aria-hidden="true"><Play size={20} /></span>
+                  {f.duration && <span className="film-card__duration">{f.duration}</span>}
+                </span>
+                <span className="photo-card__body">
+                  <small>{[f.recordedOn, f.location].filter(Boolean).join(" · ") || "Film"}</small>
+                  <strong>{f.title}</strong>
+                  <span className="photo-card__credit">{f.credit}</span>
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      ) : category === FILMS ? (
         <div className="empty-state">
           <span className="empty-state__icon"><Clapperboard size={28} aria-hidden="true" /></span>
           <h2>Moving pictures are on the way</h2>
@@ -122,6 +160,42 @@ export function Gallery() {
           </AnimatePresence>
         </div>
       )}
+
+      <dialog
+        ref={filmDialog}
+        className="photo-dialog film-dialog"
+        aria-label={playing ? playing.title : "Film"}
+        onClose={() => setPlaying(null)}
+        onClick={(e) => { if (e.target === filmDialog.current) filmDialog.current.close(); }}
+      >
+        {playing && (
+          <>
+            <button type="button" className="icon-btn dialog-close" aria-label="Close film" data-sound="none" onClick={() => filmDialog.current?.close()}>
+              <X size={20} />
+            </button>
+            <div className="film-player">
+              <iframe
+                src={embedUrl(playing) ?? undefined}
+                title={playing.title}
+                allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                allowFullScreen
+                referrerPolicy="strict-origin-when-cross-origin"
+              />
+            </div>
+            <div className="lightbox-caption">
+              <div>
+                <span className="lightbox-count">{[playing.recordedOn, playing.location].filter(Boolean).join(" · ") || "Film"}</span>
+                <h2>{playing.title}</h2>
+                {playing.description && <p>{playing.description}</p>}
+                <p className="lightbox-credit">{playing.credit}{playing.license ? ` · ${playing.license}` : ""}</p>
+              </div>
+              <a className="link" href={playing.url} target="_blank" rel="noopener noreferrer">
+                Watch on {playing.provider === "vimeo" ? "Vimeo" : "YouTube"} <ArrowUpRight aria-hidden="true" />
+              </a>
+            </div>
+          </>
+        )}
+      </dialog>
 
       <dialog
         ref={dialog}

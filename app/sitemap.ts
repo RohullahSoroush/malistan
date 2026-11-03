@@ -1,11 +1,11 @@
 import type { MetadataRoute } from "next";
-import { articles } from "@/lib/content";
-import { photos } from "@/lib/photos";
-import { abs, pages, UPDATED } from "@/lib/seo";
+import { getArchive } from "@/lib/archive";
+import { abs, articlePage, pages, UPDATED } from "@/lib/seo";
 
-export const dynamic = "force-static";
+export const revalidate = 3600;
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const { order, articles, photos } = await getArchive();
   const home = {
     url: abs("/").replace(/\/$/, ""),
     lastModified: UPDATED,
@@ -14,12 +14,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     images: [abs(pages.home.image), ...photos.slice(0, 3).map((p) => abs(p.src))],
   };
 
-  const stories = Object.entries(articles).map(([slug, a]) => ({
+  const stories = order.map((slug) => [slug, articles[slug]!] as const).map(([slug, a]) => ({
     url: abs(`/${slug}`),
     lastModified: UPDATED,
     changeFrequency: "monthly" as const,
     priority: slug === "about" ? 0.6 : 0.8,
-    images: [abs(a.image), abs(pages[slug].image)],
+    images: [...new Set([...(a.image ? [abs(a.image)] : []), abs(articlePage(slug, a).image)])],
   }));
 
   return [

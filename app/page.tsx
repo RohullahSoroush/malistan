@@ -12,13 +12,17 @@ import { Seasons } from "@/components/home/seasons";
 import { JsonLd } from "@/components/seo/json-ld";
 import { Reveal } from "@/components/ui/reveal";
 import { graph, homeGraph, pageMetadata } from "@/lib/seo";
+import { getArchive } from "@/lib/archive";
 
 export const metadata: Metadata = pageMetadata("home", "/", { absoluteTitle: true });
 
-export default function Home() {
+export const revalidate = 60;
+
+export default async function Home() {
+  const { photos } = await getArchive();
   return (
     <main id="main">
-      <JsonLd data={graph(homeGraph())} />
+      <JsonLd data={graph(homeGraph(photos))} />
       <Hero />
       <Facts />
       <Intro />

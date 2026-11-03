@@ -16,7 +16,7 @@ npm run check
 npm run build
 ```
 
-Every page is pre-rendered at build time. The only server code is `app/api/contact/route.ts`, which emails contact-form messages through Resend. There is no database, account system or upload endpoint.
+Content — articles, photographs, films, people, sources and site settings — is edited at **admin.malistan.org** and read from the archive's Supabase database (`lib/archive.ts`). Pages are pre-rendered and refresh at most once a minute (ISR), and only rows marked *published* are readable with the public key. If the database can't be reached (or `SUPABASE_ANON_KEY` isn't set), the site falls back to the built-in content in `lib/content.ts` and `lib/photos.ts`, so it never goes blank. The only other server code is `app/api/contact/route.ts`, which emails contact-form messages through Resend and files them in the admin's Messages inbox.
 
 ## Pages and interactions
 
@@ -32,7 +32,7 @@ Every page is pre-rendered at build time. The only server code is `app/api/conta
 
 ## Content and images
 
-Edit `lib/content.ts` for articles, source records and photo metadata. Edit `app/page.tsx` for the landing-page narrative. Add photos under `public/images/` and corresponding metadata in `photos`. New article keys automatically create static routes and appear in the sitemap and archive search.
+Edit content in the admin. `lib/content.ts` and `lib/photos.ts` remain as the built-in fallback. Edit `app/page.tsx` for the landing-page narrative. Add photos under `public/images/` and corresponding metadata in `photos`. New article keys automatically create static routes and appear in the sitemap and archive search.
 
 The two opening photographs are real Malistan images from Wikimedia Commons, credited to Danial and Mohammad Reza Rahmani under CC BY-SA 4.0. WebP copies have been resized; layouts may crop them. Keep the attribution and original-source links on `/sources`. Do not assume other internet images can be republished.
 

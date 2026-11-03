@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { articles, sources } from "./content";
-import { photos, type Photo } from "./photos";
+import type { Article } from "./content";
+import type { Photo } from "./photos";
+import type { Source } from "./archive";
 import { CONTACT_EMAIL, siteUrl } from "./site-url";
 
 export const SITE_NAME = "Malistan Archive";
@@ -26,7 +27,7 @@ export const founder = {
   blur: "data:image/webp;base64,UklGRm4AAABXRUJQVlA4IGIAAABQAgCdASoQABAAA4BaJQBOj+ADHFDfRkuWzAAA/vi0LgbmakCHr76Z61vx6+6ms5jNc0kPATZVjlnz2abkdOmA4L/oefk2eic8KI37vIqQCs7TrAWVt5NMWohtaP5UHB4AAA==" as const,
 };
 
-type PageSeo = { title: string; description: string; image: string; imageAlt: string };
+export type PageSeo = { title: string; description: string; image: string; imageAlt: string };
 
 /** Search titles stay under ~60 characters with the brand suffix, descriptions under 160. */
 export const pages: Record<string, PageSeo> = {
@@ -95,9 +96,24 @@ export const pages: Record<string, PageSeo> = {
   },
 };
 
+/** Search data for an article: the hand-written entry in `pages`, or one built from the article itself (new articles
+ *  written in the admin). Descriptions stay under 160 characters. */
+export function articlePage(slug: string, a: Article): PageSeo {
+  const known = pages[slug];
+  if (known) return known;
+  const title = a.title.replace(/\s*\n\s*/g, " ").trim();
+  const intro = a.intro.replace(/\s+/g, " ").trim();
+  return {
+    title,
+    description: intro.length > 155 ? `${intro.slice(0, intro.lastIndexOf(" ", 152))}…` : intro,
+    image: a.image || pages.home.image,
+    imageAlt: title,
+  };
+}
+
 /** Complete metadata for a page: title, description, canonical, Open Graph and Twitter. */
-export function pageMetadata(key: string, path: string, options: { type?: "website" | "article"; absoluteTitle?: boolean } = {}): Metadata {
-  const page = pages[key];
+export function pageMetadata(key: string, path: string, options: { type?: "website" | "article"; absoluteTitle?: boolean; page?: PageSeo } = {}): Metadata {
+  const page = options.page ?? pages[key];
   const fullTitle = options.absoluteTitle ? page.title : `${page.title} | ${SITE_NAME}`;
   const image = { url: page.image, width: 1200, height: 630, alt: page.imageAlt, type: "image/jpeg" };
   return {
@@ -214,8 +230,7 @@ export function breadcrumbs(trail: [name: string, path: string][]) {
   };
 }
 
-export function webPage(type: string, key: string, path: string, extra: Record<string, unknown> = {}) {
-  const page = pages[key];
+export function webPage(type: string, key: string, path: string, extra: Record<string, unknown> = {}, page: PageSeo = pages[key]) {
   const url = path === "/" ? siteUrl : abs(path);
   return {
     "@type": type,
@@ -233,9 +248,8 @@ export function webPage(type: string, key: string, path: string, extra: Record<s
   };
 }
 
-export function articleGraph(slug: string) {
-  const a = articles[slug];
-  const page = pages[slug];
+export function articleGraph(slug: string, a: Article, sources: Source[]) {
+  const page = articlePage(slug, a);
   const path = `/${slug}`;
   const cited = [...new Set(a.sections.map((s) => s.source).filter(Boolean))]
     .map((id) => sources.find((s) => s.id === id))
@@ -243,7 +257,7 @@ export function articleGraph(slug: string) {
   const words = [a.intro, ...a.sections.map((s) => s.text)].join(" ").split(/\s+/).length;
 
   const graph: Record<string, unknown>[] = [
-    webPage(slug === "about" ? "AboutPage" : "WebPage", slug, path, { breadcrumb: { "@id": abs(`${path}#breadcrumb`) } }),
+    webPage(slug === "about" ? "AboutPage" : "WebPage", slug, path, { breadcrumb: { "@id": abs(`${path}#breadcrumb`) } }, page),
     breadcrumbs([[page.title, path]]),
     {
       "@type": "Article",
@@ -252,7 +266,7 @@ export function articleGraph(slug: string) {
       alternativeHeadline: page.title,
       description: page.description,
       articleSection: a.eyebrow,
-      image: [abs(page.image), abs(a.image)],
+      image: [...new Set([abs(page.image), ...(a.image ? [abs(a.image)] : [])])],
       author: { "@type": "Person", "@id": ids.founder, name: founder.name, url: founder.url },
       publisher: {
         "@type": "Organization",
@@ -269,7 +283,7 @@ export function articleGraph(slug: string) {
       about: { "@id": ids.place },
       keywords: ["Malistan", "مالستان", "Ghazni", "Hazarajat", "Afghanistan", a.eyebrow],
       ...(cited.length
-        ? { citation: cited.map((s) => ({ "@type": "CreativeWork", name: s.name, url: s.url })) }
+        ? { citation: cited.map((s) => ({ "@type": "CreativeWork", name: s.name, ...(s.url ? { url: s.url } : {}) })) }
         : {}),
     },
   ];
@@ -277,7 +291,7 @@ export function articleGraph(slug: string) {
   return graph;
 }
 
-export function galleryGraph() {
+export function galleryGraph(photos: Photo[]) {
   return [
     webPage("CollectionPage", "gallery", "/gallery", {
       breadcrumb: { "@id": abs("/gallery#breadcrumb") },
@@ -295,16 +309,16 @@ export function galleryGraph() {
   ];
 }
 
-export function homeGraph() {
+export function homeGraph(photos: Photo[]) {
   return [
     webPage("WebPage", "home", "/", {
-      primaryImageOfPage: imageObject(photos[0]),
+      ...(photos[0] ? { primaryImageOfPage: imageObject(photos[0]) } : {}),
       mainEntity: { "@id": ids.place },
     }),
   ];
 }
 
-export function sourcesGraph() {
+export function sourcesGraph(sources: Source[]) {
   return [
     webPage("CollectionPage", "sources", "/sources", { breadcrumb: { "@id": abs("/sources#breadcrumb") } }),
     breadcrumbs([[pages.sources.title, "/sources"]]),
@@ -315,7 +329,7 @@ export function sourcesGraph() {
       itemListElement: sources.map((s, i) => ({
         "@type": "ListItem",
         position: i + 1,
-        item: { "@type": "CreativeWork", name: s.name, url: s.url, description: s.note },
+        item: { "@type": "CreativeWork", name: s.name, ...(s.url ? { url: s.url } : {}), description: s.note },
       })),
     },
   ];

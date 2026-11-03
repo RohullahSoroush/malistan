@@ -6,6 +6,8 @@ import { Ambient } from "@/components/layout/ambient";
 import { Experience } from "@/components/layout/experience";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
+import { Announcement } from "@/components/layout/announcement";
+import { getArchive } from "@/lib/archive";
 import { SoundLayer } from "@/components/sound/sound-layer";
 import "./globals.css";
 import "@/styles/tokens.css";
@@ -70,7 +72,15 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+// Content comes from the archive database (edited at admin.malistan.org); pages refresh at most once a minute.
+export const revalidate = 60;
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const archive = await getArchive();
+  const search = archive.order.map((slug) => {
+    const a = archive.articles[slug]!;
+    return { slug, title: a.title, eyebrow: a.eyebrow, text: `${a.intro} ${a.sections.map((s) => `${s.title} ${s.text}`).join(" ")}` };
+  });
   return (
     <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
@@ -85,9 +95,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Ambient />
         <Experience />
         <SoundLayer />
-        <Header />
+        <Header articles={search} />
         {children}
         <Footer />
+        {archive.settings.announcement && <Announcement text={archive.settings.announcement} href={archive.settings.announcementUrl} />}
       </body>
     </html>
   );

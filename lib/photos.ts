@@ -1,5 +1,6 @@
 // Generated from the original photographs (dimensions and blur previews included).
-export type PhotoCategory = "Landscapes" | "Fields & paths" | "Pastures & streams" | "Seasons";
+// Categories are free text in the admin; these four are the built-in collection's.
+export type PhotoCategory = string;
 
 export type Photo = {
   id: string;

@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
-import { photo, photos } from "@/lib/photos";
+import { photo } from "@/lib/photos";
+import { getArchive } from "@/lib/archive";
 import { Button } from "@/components/ui/button";
 import { SectionHeader } from "@/components/ui/section";
 import { Reveal } from "@/components/ui/reveal";
@@ -13,7 +14,8 @@ const tiles = [
   { photo: photo("malistan-flock"), area: "d", sizes: "(max-width: 760px) 50vw, 25vw" },
 ];
 
-export function GalleryPreview() {
+export async function GalleryPreview() {
+  const { photos } = await getArchive();
   return (
     <section className="section" aria-labelledby="lens-title">
       <div className="container">

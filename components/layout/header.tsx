@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { ArrowRight, ArrowUpRight, BookOpen, Menu, Search, X } from "lucide-react";
-import { articles } from "@/lib/content";
 import { Brand } from "./brand";
 import { ThemeToggle } from "./theme-toggle";
 import { SoundToggle } from "@/components/sound/sound-toggle";
@@ -28,7 +27,9 @@ const panelMotion = {
   transition: { duration: 0.28, ease: [0.22, 1, 0.36, 1] as const },
 };
 
-export function Header() {
+export type SearchArticle = { slug: string; title: string; eyebrow: string; text: string };
+
+export function Header({ articles }: { articles: SearchArticle[] }) {
   const path = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -71,11 +72,7 @@ export function Header() {
 
   const q = query.trim().toLowerCase();
   const results = q
-    ? Object.entries(articles).filter(([slug, a]) =>
-        `${slug} ${a.title} ${a.eyebrow} ${a.intro} ${a.sections.map((s) => `${s.title} ${s.text}`).join(" ")}`
-          .toLowerCase()
-          .includes(q),
-      )
+    ? articles.filter((a) => `${a.slug} ${a.title} ${a.eyebrow} ${a.text}`.toLowerCase().includes(q))
     : [];
 
   const isActive = (href: string) => path === href || path.startsWith(`${href}/`);
@@ -177,7 +174,7 @@ export function Header() {
               <div aria-live="polite">
                 {results.length ? (
                   <ul className="search-results">
-                    {results.map(([slug, a]) => (
+                    {results.map(({ slug, ...a }) => (
                       <li key={slug}>
                         <Link href={`/${slug}`} className="search-result">
                           <span className="search-result__icon"><BookOpen size={17} /></span>

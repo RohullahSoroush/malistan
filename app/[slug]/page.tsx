@@ -8,23 +8,71 @@ import { TopicCard } from "@/components/cards/topic-card";
 import { Toc } from "@/components/toc";
 import { Eyebrow, SectionHeader } from "@/components/ui/section";
 import { Reveal } from "@/components/ui/reveal";
-import { articles, sources } from "@/lib/content";
-import { photos } from "@/lib/photos";
-import { articleGraph, graph, pageMetadata, pages } from "@/lib/seo";
+import { getArchive, type Person } from "@/lib/archive";
+import { articleGraph, articlePage, graph, pageMetadata } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/json-ld";
 import { CONTACT_EMAIL } from "@/lib/site-url";
 
-// Only the stories in lib/content.ts exist; any other address is a 404.
-export const dynamicParams = false;
+// Articles come from the archive (published in the admin). Known ones are prerendered; a new one renders on its first
+// visit; every page refreshes at most once a minute, and an unpublished address is a 404.
+export const revalidate = 60;
+export const dynamicParams = true;
 
-export function generateStaticParams() {
-  return Object.keys(articles).map((slug) => ({ slug }));
+export async function generateStaticParams() {
+  return (await getArchive()).order.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  if (!articles[slug] || !pages[slug]) return { title: "Page not found" };
-  return pageMetadata(slug, `/${slug}`, { type: "article" });
+  const a = (await getArchive()).articles[slug];
+  if (!a) return { title: "Page not found" };
+  return pageMetadata(slug, `/${slug}`, { type: "article", page: articlePage(slug, a) });
+}
+
+function initials(name: string) {
+  return name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]!.toUpperCase()).join("");
+}
+
+/** Profiles of the people of Malistan (admin → People), shown on the people article. */
+function PeopleProfiles({ people, sources }: { people: Person[]; sources: { id: string; name: string; date: string; url: string }[] }) {
+  return (
+    <section className="people-grid" aria-label="Profiles">
+      {people.map((p) => {
+        const source = p.source ? sources.find((s) => s.id === p.source) : undefined;
+        return (
+          <article className="person-card" id={`person-${p.slug}`} key={p.slug}>
+            <span className="person-card__portrait">
+              {p.photo ? <Image src={p.photo} alt={`Portrait of ${p.name}`} fill sizes="72px" /> : <span aria-hidden="true">{initials(p.name)}</span>}
+            </span>
+            <div>
+              <h3>{p.name}</h3>
+              {p.nativeName && <p className="person-card__native" lang="fa" dir="rtl">{p.nativeName}</p>}
+              <p className="person-card__meta">{[p.role, p.village, p.life].filter(Boolean).join(" · ")}</p>
+            </div>
+            <div className="person-card__body">
+              {p.summary && <p>{p.summary}</p>}
+              {p.bio && p.bio !== p.summary && (
+                <details>
+                  <summary>Read more</summary>
+                  {p.bio.split(/\n{2,}/).map((para, i) => <p key={i}>{para}</p>)}
+                </details>
+              )}
+              {source && (
+                source.url ? (
+                  <a className="source-pill" href={source.url} target="_blank" rel="noopener noreferrer">
+                    <BookMarked size={15} aria-hidden="true" /> {source.name}{source.date ? ` · ${source.date}` : ""}
+                  </a>
+                ) : (
+                  <span className="source-pill"><BookMarked size={15} aria-hidden="true" /> {source.name}</span>
+                )
+              )}
+              {p.photo && p.photoCredit && <small className="photo-card__credit">Portrait: {p.photoCredit}</small>}
+            </div>
+          </article>
+        );
+      })}
+    </section>
+  );
 }
 
 // Turns the contact address inside article text into a mailto link.
@@ -40,18 +88,22 @@ function slugify(value: string) {
 
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  const { articles, order, sources, photos, people } = await getArchive();
   const a = articles[slug];
   if (!a) notFound();
 
   const words = [a.intro, ...a.sections.map((s) => s.text)].join(" ").split(/\s+/).length;
   const minutes = Math.max(1, Math.round(words / 220));
   const toc = a.sections.map((s) => ({ id: slugify(s.title), label: s.title.split(" · ")[0] }));
-  const more = Object.entries(articles).filter(([key]) => key !== slug && key !== "about").slice(0, 3);
-  const cover = photos.find((p) => p.src === a.image) ?? photos[0];
+  const more = order.filter((key) => key !== slug && key !== "about").slice(0, 3).map((key) => [key, articles[key]!] as const);
+  const known = photos.find((p) => p.src === a.image);
+  const cover = known ?? (a.image
+    ? { src: a.image, description: a.title.replace(/\n/g, " "), title: a.eyebrow || "Cover", credit: "Malistan Archive", blur: "empty" as const }
+    : photos[0]!);
 
   return (
     <main id="main" className="page">
-      <JsonLd data={graph(articleGraph(slug))} />
+      <JsonLd data={graph(articleGraph(slug, a, sources))} />
       <div className="container">
         <header className="article-hero">
           <Link href="/" className="back-link"><ArrowLeft size={15} aria-hidden="true" /> Back home</Link>
@@ -80,18 +132,21 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         <div className="article-layout">
           <Toc items={toc} />
           <article className="prose">
+            {slug === "people" && people.length > 0 && <PeopleProfiles people={people} sources={sources} />}
             {a.sections.map((s, i) => {
               const source = s.source ? sources.find((x) => x.id === s.source) : undefined;
               return (
-                <section className="chapter" id={toc[i].id} key={s.title}>
+                <section className="chapter" id={toc[i]!.id} key={`${i}-${s.title}`}>
                   <span className="chapter__num">CHAPTER {String(i + 1).padStart(2, "0")}</span>
                   <h2>{s.title}</h2>
                   <p>{linkEmail(s.text)}</p>
-                  {source && (
+                  {source && (source.url ? (
                     <a className="source-pill" href={source.url} target="_blank" rel="noopener noreferrer">
-                      <BookMarked size={15} aria-hidden="true" /> {source.name} · {source.date}
+                      <BookMarked size={15} aria-hidden="true" /> {source.name}{source.date ? ` · ${source.date}` : ""}
                     </a>
-                  )}
+                  ) : (
+                    <span className="source-pill"><BookMarked size={15} aria-hidden="true" /> {source.name}{source.date ? ` · ${source.date}` : ""}</span>
+                  ))}
                 </section>
               );
             })}
