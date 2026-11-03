@@ -49,7 +49,8 @@ export function Gallery({ photos, films }: { photos: Photo[]; films: Film[] }) {
   // Deep links such as /gallery#malistan-stream open that photograph.
   useEffect(() => {
     const fromHash = () => {
-      const id = decodeURIComponent(window.location.hash.slice(1));
+      let id = "";
+      try { id = decodeURIComponent(window.location.hash.slice(1)); } catch { return; }
       if (!id || !photos.some((p) => p.id === id)) return;
       // The photo may sit outside the current filter (or the Films tab), so show everything.
       setCategory(ALL);

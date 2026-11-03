@@ -66,7 +66,7 @@ const opt = (v: unknown) => (typeof v === "string" && v.trim() ? v : null);
 /** Site paths and https links only — never protocol-relative or other schemes. */
 const safeSrc = (v: unknown) => {
   const s = str(v);
-  return /^https:\/\//.test(s) || /^\/[^/\\]/.test(s) ? s : "";
+  return /^https:\/\/[^\s\\]+$/.test(s) || /^\/(?![/\\])[^\s\\]*$/.test(s) ? s : "";
 };
 
 async function read(path: string): Promise<Row[]> {
@@ -112,7 +112,8 @@ async function load(): Promise<Archive> {
       src: safeSrc(p.src),
       width: Number(p.width) || 1200,
       height: Number(p.height) || 800,
-      blur: (/^data:image\//.test(str(p.blur)) ? str(p.blur) : NEUTRAL_BLUR) as Photo["blur"],
+      // Exactly a base64 image: next/image places it inside an inline style.
+      blur: (/^data:image\/(webp|jpeg|png|gif);base64,[A-Za-z0-9+/=]+$/.test(str(p.blur)) ? str(p.blur) : NEUTRAL_BLUR) as Photo["blur"],
       title: str(p.title),
       description: str(p.description),
       category: str(p.category) || "Landscapes",
@@ -150,7 +151,7 @@ async function load(): Promise<Archive> {
       tagline: str(s.tagline) || fallback.settings.tagline,
       contactEmail: str(s.contact_email) || CONTACT_EMAIL,
       announcement: announcementOn ? str(s.announcement) : null,
-      announcementUrl: announcementOn && announcementUrl && (/^https:\/\//.test(announcementUrl) || /^\/[^/\\]/.test(announcementUrl)) ? announcementUrl : null,
+      announcementUrl: announcementOn && announcementUrl ? safeSrc(announcementUrl) || null : null,
       contributionsOpen: s.contributions_open !== false,
     },
     live: true,
